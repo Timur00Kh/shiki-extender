@@ -1,0 +1,15 @@
+{
+  "name": "shiki_ex_server",
+  "version": "1.0.0",
+  "main": "shiki_ex_server.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node shiki_ex_server.js -p 81"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "minimist": "^1.2.0",
+    "pg": "^7.11.0"
+  }
+}

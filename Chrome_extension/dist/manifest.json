@@ -1,0 +1,44 @@
+{
+  "manifest_version": 2,
+  "name": "Shiki extender",
+  "description": "",
+  "version": "1.0.0",
+  "options_page": "index.html#options",
+  
+  "permissions": [
+    "downloads",
+    "notifications",
+    "contextMenus",
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "unlimited_storage",
+    "*://*.pictshare.net/",
+    "*://images.google.com/*",
+    "*://google.com/*",
+    "*://yandex.ru/*",
+    "activeTab",
+    "<all_urls>",
+    "http://*/",
+    "https://*/"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "*://shikimori.one/*",
+        "*://shikimori.org/*"
+      ],
+      "css": [],
+      "js": ["/js/executable/altWatcher-bundle.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+
+  "background": {
+    "scripts": [
+      "background.js-bundle.js"
+    ]
+  }
+}
