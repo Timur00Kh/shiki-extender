@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {Pool} = require('pg');
-const {dbConfig} = require('../config/config');
+const args = require('minimist')(process.argv.slice(2));
+const {dbConfig} = require(args.DB_CONFIG || '../config/db_config');
 const pg = new Pool(dbConfig);
 pg.connect();
 
