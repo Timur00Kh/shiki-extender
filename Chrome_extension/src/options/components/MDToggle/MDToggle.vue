@@ -6,6 +6,7 @@
                style="display:none"
                @change="onChange"
                :checked="checked"
+               :disabled="disabled"
         />
         <label :for="id" class="toggle"><span></span></label>
     </div>
@@ -16,6 +17,7 @@
         name: "MDToggle",
         props: {
             checked: Boolean,
+            disabled: Boolean,
             onChange: Function,
             label: String
         },

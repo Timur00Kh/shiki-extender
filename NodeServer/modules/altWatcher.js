@@ -87,7 +87,7 @@ router.get('/link/:linkId/inc-num-of-downloads', async (request, response) => {
     }
 });
 
-const SQL_SELECT_DEFAULT = `SELECT * FROM altwatcher_link WHERE is_default = TRUE;`
+const SQL_SELECT_DEFAULT = `SELECT * FROM altwatcher_link WHERE is_default = TRUE;`;
 router.get('/defaultLinks', async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');
     try {

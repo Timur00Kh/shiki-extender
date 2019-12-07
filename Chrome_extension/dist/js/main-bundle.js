@@ -2865,10 +2865,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "MDToggle",
   props: {
     checked: Boolean,
+    disabled: Boolean,
     onChange: Function,
     label: String
   },
@@ -3730,6 +3732,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_MDToggle_MDToggle_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/MDToggle/MDToggle.vue */ "./options/components/MDToggle/MDToggle.vue");
+//
 //
 //
 //
@@ -28631,7 +28634,7 @@ var render = function() {
     _c("input", {
       staticClass: "toggle_input ",
       staticStyle: { display: "none" },
-      attrs: { type: "checkbox", id: _vm.id },
+      attrs: { type: "checkbox", id: _vm.id, disabled: _vm.disabled },
       domProps: { checked: _vm.checked },
       on: { change: _vm.onChange }
     }),
@@ -30062,31 +30065,16 @@ var render = function() {
                 _c("MDToggle", {
                   staticClass: "mt-2",
                   attrs: {
-                    checked: _vm.shikiDump,
-                    onChange: function() {
-                      return (_vm.shikiDump = !_vm.shikiDump)
-                    }
+                    checked: false,
+                    onChange: function() {},
+                    disabled: ""
                   }
                 })
               ],
               1
             ),
             _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "col-auto" },
-              [
-                _c(
-                  "RouterLink",
-                  {
-                    staticClass: "btn btn-primary",
-                    attrs: { to: "/shikiDump" }
-                  },
-                  [_vm._v("Настройки")]
-                )
-              ],
-              1
-            )
+            _vm._m(2)
           ])
         ])
       ])
@@ -30108,6 +30096,18 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-auto" }, [
       _c("h4", [_vm._v("shikiDump")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-auto" }, [
+      _c(
+        "button",
+        { staticClass: "disabled btn btn-primary", attrs: { disabled: "" } },
+        [_vm._v("Настройки")]
+      )
     ])
   }
 ]
@@ -42007,7 +42007,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "apiDomain", function() { return apiDomain; });
-var apiDomain = 'http://192.168.1.11:81';
+// export const apiDomain = 'http://185.139.70.70';
+var apiDomain = 'http://localhost';
 
 /***/ }),
 

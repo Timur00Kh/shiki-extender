@@ -1,1 +1,2 @@
-export const apiDomain = 'http://192.168.1.11:81';
+// export const apiDomain = 'http://185.139.70.70';
+export const apiDomain = 'http://localhost';

@@ -38,7 +38,7 @@
 
   "background": {
     "scripts": [
-      "background.js-bundle.js"
+      "background-bundle.js"
     ]
   }
 }

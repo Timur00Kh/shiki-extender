@@ -143,6 +143,12 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
         });
         return true;
       }
+
+    case "altWatcherIsEnabled":
+      {
+        sendResponse(localStorage.getItem('altWatcher'));
+        return true;
+      }
   }
 });
 chrome.runtime.onStartup.addListener(onStartup);
@@ -14255,9 +14261,10 @@ module.exports = g;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "apiDomain", function() { return apiDomain; });
-var apiDomain = 'http://192.168.1.11:81';
+// export const apiDomain = 'http://185.139.70.70';
+var apiDomain = 'http://localhost';
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=background.js-bundle.js.map
+//# sourceMappingURL=background-bundle.js.map

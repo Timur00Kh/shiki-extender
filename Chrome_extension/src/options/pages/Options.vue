@@ -27,12 +27,13 @@
                         <div class="col-auto ml-auto">
                             <MDToggle
                                     class="mt-2"
-                                    :checked="shikiDump"
-                                    :onChange="() => shikiDump = !shikiDump"
+                                    :checked="false"
+                                    :onChange="() => {}"
+                                    disabled
                             />
                         </div>
                         <div class="col-auto">
-                            <RouterLink class="btn btn-primary" to="/shikiDump">Настройки</RouterLink>
+                            <button disabled class="disabled btn btn-primary">Настройки</button>
                         </div>
                         </div>
                 </li>

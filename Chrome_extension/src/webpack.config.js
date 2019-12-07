@@ -12,7 +12,7 @@ module.exports = {
     entry: {
         'js/main': path.join(__dirname, 'options',  'options.js'),
         'js/executable/altWatcher': path.join(__dirname, 'executable', "AltWhatcher", 'altWatcher.js'),
-        'background.js': path.join(__dirname, 'background.js')
+        'background': path.join(__dirname, 'background.js')
     },
     devServer: {
         contentBase: './dist',
