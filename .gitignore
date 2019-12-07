@@ -1,2 +1,3 @@
 .idea
 Chrome_extension/dist
+Chrome_extension/dist/*
