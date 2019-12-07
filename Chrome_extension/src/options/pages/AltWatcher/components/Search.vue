@@ -103,7 +103,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-auto ml-auto">
                                 <button @click="onSaveButtonClick(link)"
                                         style="margin-top: -5px"
                                         :disabled="link.alreadyAdded"
@@ -215,7 +215,7 @@
                         approved: e.approved,
                         number_of_downloads: e.number_of_downloads,
                         description: e.description,
-                        alreadyAdded: !!this.links.find(el => el.id === e.id),
+                        alreadyAdded: !!this.links.find(el => el.id == e.id),
                         more: e.more
                     })
                 )

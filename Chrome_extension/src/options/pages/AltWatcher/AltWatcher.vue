@@ -15,6 +15,12 @@
             </li>
         </ul>
 
+        <div v-if="current === 'faq'" class="card mt-3">
+            <div class="card-body">
+                <vue-markdown :source="faq"></vue-markdown>
+            </div>
+        </div>
+
         <div v-if="current === 'added'" class="card mt-3">
             <div class="card-body">
                 <div class="row justify-content-between">
@@ -218,6 +224,7 @@
     import Search from './components/Search.vue'
     import MDCheckbox from '../../components/MDCheckbox/MDCheckbox.vue'
     import 'babel-polyfill'
+    import VueMarkdown from 'vue-markdown'
 
 
 
@@ -231,12 +238,14 @@
                 current: "added",
                 // current: "search",
                 links: [],
-                modal: null
+                modal: null,
+                faq: '# Загрузка...'
             }
         },
         components: {
             Search,
-            MDCheckbox
+            MDCheckbox,
+            VueMarkdown
         },
         mounted() {
             db.open({
@@ -261,6 +270,9 @@
                     })
 
             });
+            axios.get(`${apiDomain}/altWatcher/faq`)
+                .then(res => this.faq = res.data)
+                .catch(err => this.faq = err)
         },
         watch: {
             modal(e) {
@@ -283,15 +295,21 @@
                     delete l.publish;
 
                     if (publish) {
-                        let {data: {id}} = await axios.post(`${apiDomain}/altWatcher/link`, {
-                            title: l.title,
-                            link: l.link,
-                            description: l.description,
-                            manga: l.tags.manga,
-                            anime: l.tags.anime,
-                            ranobe: l.tags.ranobe
-                        });
-                        l.id = id;
+                        try {
+                            let {data: {id}} = await axios.post(`${apiDomain}/altWatcher/link`, {
+                                title: l.title,
+                                link: l.link,
+                                description: l.description,
+                                manga: l.tags.manga,
+                                anime: l.tags.anime,
+                                ranobe: l.tags.ranobe
+                            });
+                            l.id = id;
+                        } catch (e) {
+                            console.error(e.response);
+                            alert(e.response && e.response.data && e.response.data.error || 'Что-то пошло не так');
+                            return;
+                        }
                     }
                 }
                 /*Добавляем в локал БД*/
@@ -378,7 +396,6 @@
                 }, 10);
             }
         },
-
         computed: {
             tagButtonsDesc() {
                 const tags = this.modal.tags;

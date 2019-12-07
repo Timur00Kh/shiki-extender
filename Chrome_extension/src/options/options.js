@@ -7,6 +7,8 @@ import 'highlight-within-textarea'
 import 'highlight-within-textarea/jquery.highlight-within-textarea.css'
 
 
+
+
 router.beforeEach((to, from, next) => {
     console.log('---router.beforeEach', to);
     document.title = to.meta.title;
@@ -17,5 +19,5 @@ new Vue({
     el: '#app',
     router,
     // components: {  },
-    render: a => a(App)
+    render: a => a(App),
 });

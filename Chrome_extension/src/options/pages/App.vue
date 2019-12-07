@@ -1,8 +1,8 @@
 <template>
     <div>
-    <div class="container-fluid mt-sm-1 mt-md-1 mb-1 mb-md-5">
+    <div class="container my-3 mt-md-1 mb-1 mb-md-5" style="min-width: 400px; max-width: 800px">
         <div class="row justify-content-center">
-            <div class="col-sm-12 col-lg-7 col-xl-5">
+            <div class="col-12">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li v-for="r in routes" v-if="r.show" class="breadcrumb-item active" aria-current="page">

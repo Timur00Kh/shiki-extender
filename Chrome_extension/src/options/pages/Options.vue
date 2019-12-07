@@ -15,7 +15,8 @@
                             />
                         </div>
                         <div class="col-auto">
-                            <RouterLink class="btn btn-primary" to="/altWatcher">Настройки</RouterLink>
+                            <a v-if="popup" class="btn btn-primary" target="_blank" :href="getChromePath('index.html') + '#/altWatcher'">Настройки</a>
+                            <RouterLink v-else class="btn btn-primary" to="/altWatcher">Настройки</RouterLink>
                         </div>
                         </div>
                 </li>
@@ -51,9 +52,16 @@
             MDToggle
         },
         data() {
+            console.log(this.$route);
             return {
                 altWatcher: isEnabled('altWatcher'),
                 shikiDump: isEnabled('shikiDump'),
+                popup: this.$route.query.popup
+            }
+        },
+        methods: {
+            getChromePath(file) {
+                return getChromePath(file)
             }
         },
         watch: {
@@ -71,6 +79,10 @@
             res = (res === 'true');
         }
         return res;
+    }
+
+    function getChromePath(file) {
+        return chrome.runtime.getURL(file)
     }
 </script>
 

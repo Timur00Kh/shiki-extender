@@ -197,6 +197,7 @@
 
     function encodeName(name, encoding) {
         switch (encoding) {
+            case 'UTF8':
             case 'UTF-8': {
                 return encodeURIComponent(name);
             }

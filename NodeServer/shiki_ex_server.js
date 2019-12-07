@@ -9,7 +9,7 @@ const port = args.p || args.port || 8081;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // что за extended??
-app.use('/altWatcher', require('./modules/altWatcher.js'));
+app.use('/altWatcher', require('./modules/altWatcher/altWatcher.js'));
 
 /*Тут типо сервер стартовал*/
 app.listen(port);

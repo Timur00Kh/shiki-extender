@@ -1,8 +1,9 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const {Pool} = require('pg');
 const args = require('minimist')(process.argv.slice(2));
-const {dbConfig} = require(args.DB_CONFIG || '../config/db_config');
+const {dbConfig} = require(args.DB_CONFIG || '../../config/db_config');
 const pg = new Pool(dbConfig);
 pg.connect();
 
@@ -99,6 +100,11 @@ router.get('/defaultLinks', async (request, response) => {
         console.error(e);
         response.sendStatus(500)
     }
+});
+
+router.get('/faq', async (request, response) => {
+    response.set('Access-Control-Allow-Origin', '*');
+    response.sendFile(path.join(__dirname, 'faq.md'))
 });
 
 /*Ошибки с постгресом*/
