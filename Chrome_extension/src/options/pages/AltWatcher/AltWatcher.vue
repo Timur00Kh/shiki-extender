@@ -163,7 +163,7 @@
 
                                 </div>
                                 <div class="col-auto">
-                                    <p><b>Используется для: </b>{{tagButtonsDesc}}</p>
+                                    <p><b>Предлагать для: </b>{{tagButtonsDesc}}</p>
                                 </div>
                             </div>
                             <h5 class="">URL:</h5>

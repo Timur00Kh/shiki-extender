@@ -3,10 +3,10 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const jQuery = require('jquery');
-// const hwt = require('highlight-within-textarea');
+const args = require('minimist')(process.argv.slice(2));
 
 module.exports = {
-    mode: 'development',
+    mode: args.mode || 'production',
     // mode: 'production',
     devtool: 'source-map',
     entry: {

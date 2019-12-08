@@ -6,19 +6,11 @@
   "options_page": "index.html#options",
   
   "permissions": [
-    "tabs",
-    "storage",
-    "unlimitedStorage",
-    "unlimited_storage",
-    "activeTab",
-    "<all_urls>",
-    "http://*/",
-    "https://*/"
+    "unlimitedStorage"
   ],
 
   "browser_action": {
-
-    "default_title": "Google Mail",
+    "default_title": "Shiki extender",
     "default_popup": "index.html#options?popup=true"
   },
 
