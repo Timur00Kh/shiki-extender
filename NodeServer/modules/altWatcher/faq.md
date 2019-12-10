@@ -1,232 +1,40 @@
-# Тут будет Faq, а пока так.
+# Описание
 
-[Github](https://github.com/)
-![Github](https://avatars3.githubusercontent.com/u/4599928?s=60&v=4)
+Расширение добавляет функционал для быстрого поиска аниме, манги и ранобе на сайт shikimori.
+Быстро переходи на любимые сайты.
+Добавляй и ищи новые сервисы.
 
 
-# Загрузка...
+### Добавление ссылки
+![меню добавление ссылки](https://sun9-45.userapi.com/c858016/v858016067/11f75b/6kRHvJ8YzI8.jpg)
 
+- **Название** - насвание сервиса
+- **Для чего использовать** - на страницах какого типа предлагать этот сервис. Например ссылку на ReadManga предлагать только на страницах манги, Anime365 на страницах аниме, MintManga на Rx манге.
+- **URL** - конструктор ссылок
+    - **{{title}}** - это выражение будет заменяться на название тайтла, на котором запущен скрипт.
+    - **{{id}}** - id тайтла в базе шикимори
+    - **{{episode}}** - следующий эпизод. расритывается на основе вашего списка шики.
+- **Описание** - описание сервиса, может помочь людям при поиске. 
+- **опубликовать** - поделиться ссылкой с другими пользователями расширения. После публикации она будет доступна доступна на вкладке "Поиск" всем пользователям.
 
-# h1 Heading 8-)
-<h2> h2 Heading by HTML</h2>
 
-## h2 Heading
-### h3 Heading
 
-## Horizontal Rules
 
-___
+##### Можно задать кодировку для названия аниме
+Нужно для некоторых сайтов, например для сибнета.    
 
----
+| Кодировка | алиасы (синонимы) |
+| --- | --- |
+| UTF-8 | UTF-8, UTF8 |
+| windows-1251 | windows-1251, windows1251, 1251 |
 
-***
-
-## Typographic replacements
-
-Enable typographer option to see result.
-
-(c) (C) (r) (R) (tm) (TM) (p) (P) +-
-
-test.. test... test..... test?..... test!....
-
-!!!!!! ???? ,,  -- ---
-
-"Smartypants, double quotes" and 'single quotes'
-
-
-## Emphasis
-
-**This is bold text**
-
-__This is bold text__
-
-*This is italic text*
-
-_This is italic text_
-
-~~Strikethrough~~
-
-
-## Blockquotes
-
-
-> Blockquotes can also be nested...
->> ...by using additional greater-than signs right next to each other...
-> > > ...or with spaces between arrows.
-
-
-## Lists
-
-Unordered
-
-+ Create a list by starting a line with `+`, `-`, or `*`
-+ Sub-lists are made by indenting 2 spaces:
-  - Marker character change forces new list start:
-    * Ac tristique libero volutpat at
-    + Facilisis in pretium nisl aliquet
-    - Nulla volutpat aliquam velit
-+ Very easy!
-
-Ordered
-
-1. Lorem ipsum dolor sit amet
-2. Consectetur adipiscing elit
-3. Integer molestie lorem at massa
-
-
-1. You can use sequential numbers...
-1. ...or keep all the numbers as `1.`
-
-Start numbering with offset:
-
-57. foo
-1. bar
-
-
-## Code
-
-Inline `code`
-
-Indented code
-
-    // Some comments
-    line 1 of code
-    line 2 of code
-    line 3 of code
-
-
-Block code "fences"
-
-```
-Sample text here...
-```
-Syntax highlighting
-
-``` javascript
-var foo = function (bar) {
-  return bar++;
-};
-
-console.log(foo(5));
-```
-
-``` go
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println("Hello, world!")
-}
-```
-
-## Tables
-
-| Option | Description |
-| ------ | ----------- |
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |
-
-Right aligned columns
-
-| Option | Description |
-| ------:| -----------:|
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |
-
-## Links
-
-[vue-markdown](https://github.com/miaolz123/vue-markdown)
-
-[link with title](https://github.com/miaolz123/vue-markdown "VueMarkdown")
-
-Autoconverted link https://github.com/miaolz123/vue-markdown (enable linkify to see)
-
-
-## Images
-
-![Minion](dist/img/minion.png)
-
-Like links, Images also have a footnote style syntax
-
-![Alt text][id]
-
-With a reference later in the document defining the URL location:
-
-[id]: dist/img/minion.png  "The Dojocat"
-
-
-### Emojies
-
-> Classic markup: :wink: :cry: :laughing: :yum:
->
-> Shortcuts (emoticons): :-) :-( 8-) ;)
-
-
-### Subscript / Superscript
-
-- 19^th^
-- H~2~O
-
-
-### \<ins>
-
-++Inserted text++
-
-
-### \<mark>
-
-==Marked text==
-
-
-### Footnotes
-
-Footnote 1 link[^first].
-
-Footnote 2 link[^second].
-
-Inline footnote^[Text of inline footnote] definition.
-
-Duplicated footnote reference[^second].
-
-[^first]: Footnote **can have markup**
-
-    and multiple paragraphs.
-
-[^second]: Footnote text.
-
-
-### Definition lists
-
-Term 1
-
-:   Definition 1
-with lazy continuation.
-
-Term 2 with *inline markup*
-
-:   Definition 2
-
-        { some code, part of Definition 2 }
-
-    Third paragraph of definition 2.
-
-_Compact style:_
-
-Term 1
-  ~ Definition 1
-
-Term 2
-  ~ Definition 2a
-  ~ Definition 2b
-
-
-### Abbreviations
-
-This is HTML abbreviation example.
-
-It converts "HTML", but keep intact partial entries like "xxxHTMLyyy" and so on.
-
-*[HTML]: Hyper Text Markup Language
+##### Примеры
+ 1. Ссылка на поиск в сибнете с кодировкой windows-1251.
+`https://video.sibnet.ru/search.php?&text={{title=windows-1251}}`
+ 2. Поиск по видеозаписям ВК с указанной серией из вашего списка шики.
+ `https://vk.com/video?q={{title}}  {{episode}} серия`
+  
+### Поиск ссылок
+![123](https://sun9-53.userapi.com/c858016/v858016067/11f791/yUzVSDk1Z_0.jpg)
+На странице поиске есть фильтры по типам тайтлов. По умолчанию стоит только один - звездочка.
+**Звездочка** означает, что ссылка была проверяна модератором. Если вы хотите видеть все записи, добавленные другими пользователями, то нужно снять ее.
