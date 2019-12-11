@@ -272,7 +272,10 @@
             });
             axios.get(`${apiDomain}/altWatcher/faq`)
                 .then(res => this.faq = res.data)
-                .catch(err => this.faq = err)
+                .catch(err => this.faq = err);
+            console.log('---/altWatcher/faq', () => axios.get(`${apiDomain}/altWatcher/faq`)
+                .then(res => this.faq = res.data)
+                .catch(err => this.faq = err))
         },
         watch: {
             modal(e) {

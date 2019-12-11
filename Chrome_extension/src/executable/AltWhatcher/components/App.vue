@@ -253,14 +253,27 @@
     }
 </script>
 
-<style>
-    .dropdown-item.active, .dropdown-item:active {
-        background-color: grey !important;
-    }
-    .dropdown-menu {
-        border: 2px #e9ecef solid !important;
-    }
-    .dropdown-divider {
-        border-top:  2px #e9ecef solid !important;
+<style lang="scss">
+    #altWatcherContainer {
+        @import "~bootstrap/scss/mixins";
+        @import "~bootstrap/scss/functions";
+        @import "~bootstrap/scss/variables";
+        @import "~bootstrap/scss/buttons";
+        @import "~bootstrap/scss/button-group";
+        @import "~bootstrap/scss/dropdown";
+        @import "~bootstrap/scss/root";
+        @import "~bootstrap/scss/reboot";
+        @import "~bootstrap/scss/type";
+        @import "~bootstrap-vue/src/index";
+
+        .dropdown-item.active, .dropdown-item:active {
+            background-color: grey !important;
+        }
+        .dropdown-menu {
+            border: 2px #e9ecef solid !important;
+        }
+        .dropdown-divider {
+            border-top:  2px #e9ecef solid !important;
+        }
     }
 </style>
