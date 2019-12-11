@@ -1,11 +1,13 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const cors = require('cors');
 const args = require('minimist')(process.argv.slice(2));
 
 
 const port = args.p || args.port || 8081;
 
+app.options('*', cors({origin: '*', optionsSuccessStatus: 200}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // что за extended??
