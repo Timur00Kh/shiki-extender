@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
     }
 });
 
-chrome.runtime.onStartup.addListener(onStartup);
+chrome.runtime.onInstalled.addListener(onStartup);
 async function onStartup() {
     let serv = await db.open({
         server: 'linksDb',
