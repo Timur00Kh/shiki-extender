@@ -156,12 +156,15 @@
                 win.focus();
             },
             computeLink(link) {
-                if (~link.indexOf('{{id}}')) {
+                let idMatch = ~link.indexOf('{{id}}');
+                let epMatch = ~link.indexOf('{{episode}}');
+
+                if (idMatch) {
                     let id = window.location.href.split('/')[4].match(/([0-9]*)/)[0];
                     link = link.replace('{{id}}', id)
                 }
 
-                if (~link.indexOf('{{episode}}')) {
+                if (epMatch) {
                     let episodeContainer = document.querySelector('.current-episodes');
                     link = link.replace('{{episode}}', episodeContainer ? Number(episodeContainer.innerText) + 1 : 0)
                 }
@@ -171,7 +174,8 @@
                 let titleName = encodeName(this.titles[this.lang], titleNameMatch ? titleNameMatch[1] : '');
                 if (titleNameMatch) {
                     link = link.replace((/\{\{title=?(.*?)\}\}/g), titleName)
-                } else {
+                }
+                if (!idMatch && !epMatch && !titleNameMatch){
                     link += titleName;
                 }
 
