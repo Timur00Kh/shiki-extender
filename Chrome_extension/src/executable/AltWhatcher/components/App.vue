@@ -1,22 +1,37 @@
 <template>
     <div id="altWatcherContainer" v-if="computedLinks.length > 0">
         <div>
-            <b-button-group style="width: 100%;" size="lg">
+            <b-button-group style="width: 100%; margin-top: 5px;" size="lg">
                 <b-button
                         v-if="current"
                         :href="computedUrl"
                         target="_blank"
                         style="width: 100%; text-overflow: ellipsis; max-width: 88%; white-space: nowrap; overflow: hidden;"
+                        v-b-popover:#altWatcherContainer.ds950.hover="computeLink(current.link)"
                 >{{current.title}}</b-button>
-                <b-dropdown @click="parseTitles()" right text="">
+                <b-dropdown @show="onDropDownShow()" right text="">
                     <b-dropdown-item
                             v-for="link in computedLinks"
+                            :id="'altWatcher_link_' + link.hash_id"
+                            :key="'altWatcher_link_' + link.hash_id"
                             @click.prevent="setCurrent(link)"
                             :href="computeLink(link.link)"
                             :active="link.hash_id === current.hash_id"
+                            title="Popover Title"
                     >
                         {{link.title}}
                     </b-dropdown-item>
+                    <b-popover
+                            v-for="link in computedLinks"
+                            :target="'altWatcher_link_' + link.hash_id"
+                            :key="'altWatcher_link_popover_' + link.hash_id"
+                            triggers="hover focus"
+                            container="#altWatcherContainer"
+                            placement="rightbottom">
+                        <template v-slot:title>{{link.title}}</template>
+                        <p v-if="link.description" style="margin-bottom: 0.5rem;"><b>Описание: </b>{{link.description}}</p>
+                        <p style="word-break: break-all;"><b>URL:</b> <span style="color: #DC3545;">{{computeLink(link.link)}}</span></p>
+                    </b-popover>
                     <b-dropdown-divider></b-dropdown-divider>
                     <b-dropdown-item
                             :active="lang === 'ru'"
@@ -67,13 +82,7 @@
         },
         created() {
             console.log('---', 'AltWatcher mounted');
-            let self = this;
-            chrome.runtime.sendMessage({do: "getAltWatcherLinks"},
-                function (res) {
-                    self.links = res;
-                    self.setCurrent();
-                }
-            );
+            chrome.runtime.sendMessage({do: "getAltWatcherLinks"}, this.onLinksGet);
 
             this.pageType = !!document.querySelector('a.b-tag[href*="genre/12"]') ? 1 : 2;
             if (!!~window.location.pathname.indexOf('anime')) {
@@ -88,6 +97,14 @@
 
         },
         methods: {
+            onDropDownShow(e) {
+                this.parseTitles();
+                chrome.runtime.sendMessage({do: "getAltWatcherLinks"}, this.onLinksGet);
+            },
+            onLinksGet(res) {
+                this.links = res;
+                this.setCurrent();
+            },
             setCurrent(link) {
                 let pageType = this.titleType + this.pageType;
 
@@ -160,7 +177,7 @@
                 let epMatch = ~link.indexOf('{{episode}}');
 
                 if (idMatch) {
-                    let id = window.location.href.split('/')[4].match(/([0-9]*)/)[0];
+                    let id = window.location.href.split('/')[4].match(/([0-9]+)/g)[0];
                     link = link.replace('{{id}}', id)
                 }
 
@@ -264,6 +281,7 @@
         @import "~bootstrap/scss/variables";
         @import "~bootstrap/scss/buttons";
         @import "~bootstrap/scss/button-group";
+        @import "~bootstrap/scss/popover";
         @import "~bootstrap/scss/dropdown";
         @import "~bootstrap/scss/root";
         @import "~bootstrap/scss/reboot";
@@ -277,7 +295,7 @@
             border: 2px #e9ecef solid !important;
         }
         .dropdown-divider {
-            border-top:  2px #e9ecef solid !important;
+            border-top: 2px #e9ecef solid !important;
         }
     }
 </style>

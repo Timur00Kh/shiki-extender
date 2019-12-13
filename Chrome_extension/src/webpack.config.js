@@ -6,8 +6,8 @@ const jQuery = require('jquery');
 const args = require('minimist')(process.argv.slice(2));
 
 module.exports = {
-    mode: args.mode || 'production',
-    // mode: 'production',
+    // mode: args.mode || 'production',
+    mode: 'development',
     devtool: 'source-map',
     entry: {
         'js/main': path.join(__dirname, 'options',  'options.js'),
@@ -73,7 +73,11 @@ module.exports = {
             jQuery: "jquery",
             "window.jQuery": "jquery"
         }),
-        new BundleAnalyzerPlugin()
+        new BundleAnalyzerPlugin(),
+        new webpack.SourceMapDevToolPlugin({
+            filename: '[file].map',
+            append: '\n//# sourceURL=[url]'
+        })
     ],
     resolve: {
         modules: [

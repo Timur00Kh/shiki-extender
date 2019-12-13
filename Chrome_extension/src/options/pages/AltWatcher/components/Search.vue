@@ -129,7 +129,14 @@
                                     <input type="text" :value="link.link" class="form-control" placeholder="URL"
                                            disabled>
                                 </div>
-                                <p class="text-muted mb-0">Кол-во добавлений: {{link.number_of_downloads}}</p>
+                                <div class="row justify-content-between">
+                                    <div class="col-auto">
+                                        <p class="text-muted mb-0">Кол-во добавлений: {{link.number_of_downloads}}</p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <p class="text-muted mb-0">id: {{link.id}}</p>
+                                    </div>
+                                </div>
                             </div>
                         </transition>
                     </li>

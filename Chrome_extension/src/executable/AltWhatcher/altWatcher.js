@@ -7,6 +7,9 @@ import BootstrapVue from 'bootstrap-vue'
 
 Vue.use(BootstrapVue);
 console.log("---", 'altWatcher initialized');
+import { VBPopover } from 'bootstrap-vue'
+// Note: Vue automatically prefixes the directive name with 'v-'
+Vue.directive('b-popover', VBPopover)
 
 async function start() {
 
