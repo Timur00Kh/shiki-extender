@@ -37,6 +37,8 @@
 | UTF-8 | UTF-8, UTF8 |
 | windows-1251 | windows-1251, windows1251, 1251 |
 
+P.S.: Кодировка windows-1251 не поддерживает японские символы. 
+
 ##### Примеры
  1. Ссылка на поиск в сибнете с кодировкой windows-1251.
 `https://video.sibnet.ru/search.php?&text={{title=windows-1251}}`
