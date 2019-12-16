@@ -19,7 +19,13 @@
                             :active="link.hash_id === current.hash_id"
                             title="Popover Title"
                     >
-                        {{link.title}}
+                        <img
+                                v-if="link.favicon"
+                                style="height: 16px; margin-left: -19px; margin-top: 5px; position: fixed;"
+                                :src="link.favicon"
+                                alt=""
+
+                        > {{link.title}}
                     </b-dropdown-item>
                     <b-popover
                             v-for="link in computedLinks"
@@ -205,7 +211,24 @@
         },
         computed: {
             computedLinks() {
-                return this.links.filter(link => link.tags[this.titleType] & this.pageType);
+                return this.links
+                    .filter(link => link.tags[this.titleType] & this.pageType)
+                    .map(e => {
+                        if (e.favicon) {
+                            return e;
+                        } else {
+                            try {
+                                let origin = (new URL(e.link)).origin;
+                                let favicon = origin + '/favicon.ico';
+                                return {
+                                    ...e,
+                                    favicon: favicon
+                                }
+                            } catch (error) {
+                                return e
+                            }
+                        }
+                    });
             },
             computedUrl() {
                return this.computeLink(this.current.link)
