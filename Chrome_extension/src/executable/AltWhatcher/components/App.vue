@@ -8,8 +8,9 @@
                         target="_blank"
                         style="width: 100%; text-overflow: ellipsis; max-width: 88%; white-space: nowrap; overflow: hidden;"
                         v-b-popover:#altWatcherContainer.ds950.hover="computeLink(current.link)"
+                        @click="onCurrentClick"
                 >{{current.title}}</b-button>
-                <b-dropdown @show="onDropDownShow()" right text="">
+                <b-dropdown @show="onDropDownShow()" :no-flip="computedLinks.length > 5" right text="">
                     <b-dropdown-item
                             v-for="link in computedLinks"
                             :id="'altWatcher_link_' + link.hash_id"
@@ -69,6 +70,8 @@
 </template>
 
 <script>
+    import {sortByUsedTimes} from "../../../utils/utils";
+
     export default {
         name: "App",
         data() {
@@ -132,6 +135,9 @@
                 this.current = link;
                 setPrefService(pageType, link.hash_id);
                 this.bar = false;
+            },
+            onCurrentClick() {
+                chrome.runtime.sendMessage({do: "altWatcherLinkUsed", hash_id: this.current.hash_id})
             },
             parseTitles() {
                 const self = this;
@@ -210,8 +216,9 @@
             }
         },
         computed: {
+            //TODO: избавиться от computed. Он тут не нужен.
             computedLinks() {
-                return this.links
+                let cl = this.links
                     .filter(link => link.tags[this.titleType] & this.pageType)
                     .map(e => {
                         if (e.favicon) {
@@ -229,6 +236,8 @@
                             }
                         }
                     });
+                cl.sort(sortByUsedTimes);
+                return cl;
             },
             computedUrl() {
                return this.computeLink(this.current.link)
@@ -271,13 +280,11 @@
 
     function getPrefServiceId(pageType) {
         var matches = document.cookie.match(new RegExp('(?:^|; )altWatcherPrefServiceFor' + pageType + '=([^;]*)'));
-        // console.log(matches);
         return matches ? Number(matches[1]) : null;
     }
 
     function setPrefService(pageType, hash_id) {
-        var d = new Date();
-        d.setTime(d.getTime() + 666 * 1000);
+        let d = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
         document.cookie = "altWatcherPrefServiceFor" + pageType + "=" + hash_id + "; path=/; expires=" + d.toUTCString();
     }
 
@@ -291,8 +298,7 @@
     }
 
     function setAltWatcherLanguage(value) {
-        var d = new Date();
-        d.setTime(d.getTime() + 666 * 1000);
+        let d = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
         document.cookie = "altWatcherLanguage=" + encodeURIComponent(value) + "; path=/; expires=" + d.toUTCString();
     }
 </script>

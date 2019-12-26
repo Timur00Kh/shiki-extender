@@ -1,0 +1,1 @@
+export const sortByUsedTimes = (a, b) => (b.used ? b.used : 0) - (a.used ? a.used : 0);

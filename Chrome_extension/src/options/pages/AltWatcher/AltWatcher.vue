@@ -15,9 +15,33 @@
             </li>
         </ul>
 
-        <div v-if="current === 'faq'" class="card mt-3">
-            <div class="card-body">
-                <vue-markdown :source="faq"></vue-markdown>
+        <div v-if="current === 'faq'">
+            <div v-if="linksUsed.length" class="card mt-3">
+                <div class="card-body">
+                    <div class="row align-content-center">
+                        <div class="col-10">
+                            <div class="progress" style="height: 20px;">
+                                <div
+                                        v-for="link in links"
+                                        v-if="link.used"
+                                        class="progress-bar stat"
+                                        role="progressbar"
+                                        :style="`width: ${link.used / linksTotal * 100}%; background-color: ${getNextColor()}; display: inline-block;`"
+                                >
+                                    {{link.title}} <span class="badge badge-secondary stat-inner">{{link.used}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-sm btn-danger" @click="resetLinksUses()">Сбросить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-2">
+                <div class="card-body">
+                    <vue-markdown :source="faq"></vue-markdown>
+                </div>
             </div>
         </div>
 
@@ -41,7 +65,7 @@
                                 <div class="row justify-content-between">
                                     <div class="col-auto">
                                         <h4 class="card-title">
-                                            {{link.title}}
+                                            <img v-if="link.favicon" :src="link.favicon" style="height: 16px; width: 16px;" alt=""> {{link.title}}
                                             <a @click="showModal(link)" href="#/altWatcher"
                                                class="badge badge-pill badge-light">
                                                 <i class="far fa-edit"></i>
@@ -225,6 +249,7 @@
     import MDCheckbox from '../../components/MDCheckbox/MDCheckbox.vue'
     import 'babel-polyfill'
     import VueMarkdown from 'vue-markdown'
+    import {sortByUsedTimes} from "../../../utils/utils";
 
 
 
@@ -257,18 +282,8 @@
                     }
                 }
             }).then(serv => {
-                let self = this;
                 this.linksDb = serv;
-                this.linksDb.link.query()
-                    .all()
-                    .execute()
-                    .then(results => {
-                        setTimeout(() => {
-                            self.links = results;
-                            self.loading = false;
-                        }, 300);
-                    })
-
+                this.updateLinks()
             });
             axios.get(`${apiDomain}/altWatcher/faq`)
                 .then(res => this.faq = res.data)
@@ -397,6 +412,56 @@
                 setTimeout(() => {
                     $(el).highlightWithinTextarea('update');
                 }, 10);
+            },
+            getNextColor() {
+                return colorPicker.getColor();
+            },
+            resetLinksUses() {
+                if (confirm('Вы уверены?')) {
+                    this.linksDb.link.query()
+                        .all()
+                        .execute()
+                        .then(results => {
+                            results.map(e => ({
+                                ...e,
+                                used: 0
+                            })).forEach(e => this.linksDb.link.put(e));
+                            this.updateLinks();
+                        })
+                }
+            },
+            updateLinks() {
+                let self = this;
+                this.linksDb.link.query()
+                    .all()
+                    .execute()
+                    .then(results => {
+                        if (!results || !Array.isArray(results)) {
+                            alert('Что-то пошло не так. F12, скрин консоли в групппу')
+                            return;
+                        }
+                        results = results.map(e => {
+                            if (e.favicon) {
+                                return e;
+                            } else {
+                                try {
+                                    let origin = (new URL(e.link)).origin;
+                                    let favicon = origin + '/favicon.ico';
+                                    return {
+                                        ...e,
+                                        favicon: favicon
+                                    }
+                                } catch (error) {
+                                    return e
+                                }
+                            }
+                        });
+                        results.sort(sortByUsedTimes);
+                        setTimeout(() => {
+                            self.links = results;
+                            self.loading = false;
+                        }, 300);
+                    })
             }
         },
         computed: {
@@ -419,9 +484,43 @@
 
                 return s;
 
+            },
+            linksTotal() {
+                return this.links.reduce((sum, l) => sum + (l.used ? l.used : 0), 0)
+            },
+            linksUsed() {
+                return this.links.filter(l => l.used)
             }
         }
     }
+
+    let colorPicker = {};
+    colorPicker.getColor = function () {
+        if (this.iteration - 1 > this.colors.length) {
+            this.iteration = 0
+        } else {
+            this.iteration++
+        }
+        return this.colors[this.iteration++]
+    };
+    colorPicker.iteration = -1;
+    colorPicker.colors = [
+        "#ff0000",
+        "#ffc107",
+        "#28a745",
+        "#007bff",
+        "#0000ff",
+        "#8B008B",
+        "#006400",
+        "#DAA520",
+        "#dc3545",
+        "#343a40",
+        "#800000",
+        "#00008B",
+        "#778899",
+        "#FF1493",
+        "#FF0000"
+    ];
 </script>
 
 <style scoped>
@@ -454,6 +553,34 @@
 
     .fade-enter, .fade-leave-to {
         opacity: 0;
+    }
+
+    .stat {
+        display: inline-block;
+        /*margin-top: -1px;*/
+
+    }
+
+    .stat:hover {
+        width: 100% !important;
+        display: inline-block;
+    }
+
+    .stat .stat-inner {
+        animation: animStat linear 0.8s;
+
+    }
+
+    @keyframes animStat {
+        0%{
+            opacity: 0;
+        }
+        50%{
+            opacity: 0.1;
+        }
+        100%{
+            opacity: 1;
+        }
     }
 </style>
 

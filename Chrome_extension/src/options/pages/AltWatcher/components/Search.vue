@@ -82,7 +82,7 @@
                                 <div class="row">
                                     <div class="col-auto pr-0">
                                         <h4 class="card-title">
-                                            {{link.title}}
+                                            <img v-if="link.favicon" :src="link.favicon" style="height: 16px; width: 16px" alt=""> {{link.title}}
                                         </h4>
                                     </div>
                                     <div class="col-auto">
@@ -200,7 +200,7 @@
                 this.query = query.map(e => ({
                     ...e,
                     more: false // свойство, отвечающее за показ сройлера с описанием
-                }));
+                }))
 
                 setTimeout(() => {
                     this.loading = false;
@@ -225,7 +225,22 @@
                         alreadyAdded: !!this.links.find(el => el.id == e.id),
                         more: e.more
                     })
-                )
+                ).map(e => {
+                    if (e.favicon) {
+                        return e;
+                    } else {
+                        try {
+                            let origin = (new URL(e.link)).origin;
+                            let favicon = origin + '/favicon.ico';
+                            return {
+                                ...e,
+                                favicon: favicon
+                            }
+                        } catch (error) {
+                            return e
+                        }
+                    }
+                });
             }
         }
     }
