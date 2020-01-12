@@ -377,7 +377,7 @@
                     link: "",
                     tags: {
                         manga: 0,
-                        anime: 0,
+                        anime: 2,
                         ranobe: 0,
                     },
                     description: '',
