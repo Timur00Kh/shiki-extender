@@ -195,7 +195,7 @@
 
                 if (epMatch) {
                     let episodeContainer = document.querySelector('.current-episodes');
-                    link = link.replace('{{episode}}', episodeContainer ? Number(episodeContainer.innerText) + 1 : 0)
+                    link = link.replace('{{episode}}', episodeContainer ? Number(episodeContainer.innerText) + 1 : 1)
                 }
 
                 /*Матчит только первое попадание, заменяет все*/
