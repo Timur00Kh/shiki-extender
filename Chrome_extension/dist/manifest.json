@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Shiki extender",
   "description": "",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "options_page": "index.html#options",
   
   "permissions": [
