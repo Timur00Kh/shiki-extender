@@ -35,7 +35,9 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
             return true;
         }
         case "altWatcherIsEnabled": {
-            sendResponse(localStorage.getItem('altWatcher'));
+            chrome.storage.local.get(['altWatcher'], function(result) {
+                sendResponse(result.altWatcher || null);
+            });
             return true;
         }
         case "altWatcherLinkUsed": {
