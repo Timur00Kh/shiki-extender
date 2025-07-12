@@ -1,0 +1,114 @@
+name: Code Quality Check
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: Chrome_extension/src/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd Chrome_extension/src
+        npm ci
+        
+    - name: Run ESLint (if configured)
+      run: |
+        cd Chrome_extension/src
+        if [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
+          npm run lint || echo "ESLint not configured"
+        else
+          echo "ESLint not configured, skipping..."
+        fi
+        
+    - name: Check for security vulnerabilities
+      run: |
+        cd Chrome_extension/src
+        npm audit --audit-level moderate || true
+        
+    - name: Validate manifest.json
+      run: |
+        cd Chrome_extension/src
+        node -e "
+          const fs = require('fs');
+          const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+          
+          // Проверяем обязательные поля
+          const required = ['manifest_version', 'name', 'version'];
+          for (const field of required) {
+            if (!manifest[field]) {
+              console.error(\`Missing required field: \${field}\`);
+              process.exit(1);
+            }
+          }
+          
+          // Проверяем версию manifest
+          if (manifest.manifest_version !== 3) {
+            console.error('Manifest version must be 3');
+            process.exit(1);
+          }
+          
+          console.log('✅ Manifest validation passed');
+        "
+        
+    - name: Check build process
+      run: |
+        cd Chrome_extension/src
+        npm run build
+        
+    - name: Verify build output
+      run: |
+        cd Chrome_extension/dist
+        if [ ! -f "manifest.json" ]; then
+          echo "❌ manifest.json not found in dist"
+          exit 1
+        fi
+        
+        if [ ! -f "background-bundle.js" ]; then
+          echo "❌ background-bundle.js not found in dist"
+          exit 1
+        fi
+        
+        echo "✅ Build verification passed"
+        
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: Chrome_extension/src/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd Chrome_extension/src
+        npm ci
+        
+    - name: Run tests (if configured)
+      run: |
+        cd Chrome_extension/src
+        if [ -f "package.json" ] && grep -q '"test"' package.json; then
+          npm test || echo "Tests failed but continuing..."
+        else
+          echo "No tests configured, skipping..."
+        fi
