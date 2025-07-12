@@ -1,0 +1,91 @@
+name: Build and Release Chrome Extension
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: Chrome_extension/src/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd Chrome_extension/src
+        npm ci
+        
+    - name: Build extension
+      run: |
+        cd Chrome_extension/src
+        npm run build
+        
+    - name: Create extension package
+      run: |
+        cd Chrome_extension/dist
+        zip -r ../shiki-extension-${{ github.sha }}.zip . -x "*.map"
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: chrome-extension-build
+        path: Chrome_extension/shiki-extension-${{ github.sha }}.zip
+        retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: chrome-extension-build
+        
+    - name: Get version from manifest
+      id: get_version
+      run: |
+        cd Chrome_extension/src
+        VERSION=$(node -p "require('./manifest.json').version")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: shiki-extension-${{ github.sha }}.zip
+        tag_name: v${{ steps.get_version.outputs.version }}
+        name: Release v${{ steps.get_version.outputs.version }}
+        body: |
+          Chrome Extension Release v${{ steps.get_version.outputs.version }}
+          
+          ## Changes
+          - Automated build and release
+          - Extension ready for Chrome Web Store upload
+          
+          ## Installation
+          1. Download the ZIP file
+          2. Extract it to a folder
+          3. Open Chrome and go to `chrome://extensions/`
+          4. Enable "Developer mode"
+          5. Click "Load unpacked" and select the extracted folder
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

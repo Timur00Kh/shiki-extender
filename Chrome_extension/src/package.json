@@ -8,7 +8,13 @@
     "watch": "webpack --watch",
     "start": "webpack-dev-server",
     "serve": "node express -p 80",
-    "dev": "npm-run-all -p serve start"
+    "dev": "npm-run-all -p serve start",
+    "bump-version": "node ../../scripts/bump-version.js",
+    "create-release": "node ../../scripts/create-release.js",
+    "package": "npm run build && cd ../dist && zip -r ../shiki-extension.zip . -x \"*.map\"",
+    "clean": "rm -rf dist/* && rm -f ../shiki-extension.zip",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -40,6 +46,7 @@
     "webpack": "^4.29.6",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^3.2.1",
+    "eslint": "^8.0.0"
   }
 }
