@@ -30,16 +30,17 @@ export default defineConfig({
             'libs': path.resolve(__dirname, 'src/libs'),
         },
     },
+    server: {
+        port: 5173,
+        strictPort: true,
+        host: 'localhost',
+        hmr: {
+            port: 5174,
+        },
+    },
     build: {
         sourcemap: true,
-        rollupOptions: {
-            input: {
-                main: 'index.html',
-                background: 'src/background.js',
-                altwatcher: 'src/executable/AltWhatcher/altWatcher.js',
-            },
-        },
         outDir: path.resolve(__dirname, './dist'),
         emptyOutDir: true,
     },
-}); 
+});

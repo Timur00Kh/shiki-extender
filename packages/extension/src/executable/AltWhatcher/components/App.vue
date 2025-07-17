@@ -8,7 +8,9 @@
                 class="main-button"
                 @click="onCurrentClick"
                 :title="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
-            >{{current.title}}</a>
+            >
+            {{current.title}}
+        </a>
             <div class="dropdown">
                 <button @click="showDropdown = !showDropdown" class="dropdown-button">▼</button>
                 <div v-if="showDropdown" class="dropdown-menu">
