@@ -1,10 +1,13 @@
 {
-  "name": "shiki_ex_server",
+  "name": "@shiki-extender/server",
   "version": "1.0.0",
+  "description": "Node.js server for Shiki Extender",
   "main": "shiki_ex_server.js",
   "license": "MIT",
   "scripts": {
-    "start": "node shiki_ex_server.js -p 81"
+    "start": "node shiki_ex_server.js -p 81",
+    "dev": "node shiki_ex_server.js -p 81",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

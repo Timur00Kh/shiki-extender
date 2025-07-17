@@ -9,9 +9,9 @@ module.exports = {
     mode: args.mode || 'development',
     devtool: 'source-map',
     entry: {
-        'js/main': path.join(__dirname, 'options',  'options.js'),
-        'js/executable/altWatcher': path.join(__dirname, 'executable', "AltWhatcher", 'altWatcher.js'),
-        'background': path.join(__dirname, 'background.js')
+        'js/main': path.join(__dirname, 'src', 'options', 'options.js'),
+        'js/executable/altWatcher': path.join(__dirname, 'src', 'executable', 'AltWhatcher', 'altWatcher.js'),
+        'background': path.join(__dirname, 'src', 'background.js')
     },
     devServer: {
         static: './dist',
@@ -23,7 +23,7 @@ module.exports = {
     },
     output: {
         filename: '[name]-bundle.js',
-        path: path.resolve('../dist'),
+        path: path.resolve(__dirname, 'dist'),
         clean: true
     },
     module: {
@@ -77,24 +77,24 @@ module.exports = {
         new CopyWebpackPlugin({
             patterns: [
                 {
-                    from: path.resolve(__dirname, 'public/index.html'),
-                    to: path.resolve('../dist/index.html')
+                    from: path.resolve(__dirname, 'src', 'public', 'index.html'),
+                    to: path.resolve(__dirname, 'dist', 'index.html')
                 },
                 {
-                    from: path.resolve(__dirname, 'manifest.json'),
-                    to: path.resolve('../dist/manifest.json')
+                    from: path.resolve(__dirname, 'src', 'manifest.json'),
+                    to: path.resolve(__dirname, 'dist', 'manifest.json')
                 },
                 {
-                    from: path.resolve(__dirname, 'libs'),
-                    to: path.resolve('../dist/js')
+                    from: path.resolve(__dirname, 'src', 'libs'),
+                    to: path.resolve(__dirname, 'dist', 'js')
                 }
             ]
         })
     ],
     resolve: {
         modules: [
-            path.join(__dirname, 'executable'),
-            path.join(__dirname, 'options'),
+            path.join(__dirname, 'src', 'executable'),
+            path.join(__dirname, 'src', 'options'),
             path.join(__dirname, 'node_modules'),
         ],
         alias: {
