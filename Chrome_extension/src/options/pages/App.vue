@@ -5,7 +5,7 @@
             <div class="col-12">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li v-for="r in routes" v-if="r.show" class="breadcrumb-item active" aria-current="page">
+                        <li v-for="r in routes" :key="r.href" v-show="r.show" class="breadcrumb-item active" aria-current="page">
                             <RouterLink :to="r.href">{{r.title}}</RouterLink>
                         </li>
                     </ol>
@@ -21,35 +21,39 @@
 </template>
 
 <script>
+    import { computed } from 'vue'
+    import { useRoute } from 'vue-router'
+    
     export default {
-        name: "App.vue",
-        data() {
-            return {
-                route: this.$route,
-            }
-        },
-        computed: {
-            routes() {
+        name: "App",
+        setup() {
+            const route = useRoute()
+            
+            const routes = computed(() => {
                 return [
                     {
                         title: 'Главная',
                         active: false,
-                        show: ~this.$route.path.indexOf('/'),
+                        show: route.path.includes('/'),
                         href: "/"
                     },
                     {
                         title: 'AltWatcher',
                         active: true,
-                        show: ~this.$route.path.indexOf('/altWatcher'),
+                        show: route.path.includes('/altWatcher'),
                         href: "/altWatcher"
                     },
                     {
                         title: 'ShikiDump',
                         active: true,
-                        show: ~this.$route.path.indexOf('/shikiDump'),
+                        show: route.path.includes('/shikiDump'),
                         href: "/shikiDump"
                     }
                 ]
+            })
+            
+            return {
+                routes
             }
         }
     }

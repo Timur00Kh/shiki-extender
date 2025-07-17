@@ -1,6 +1,5 @@
 import db from './libs/db';
 import axios from 'axios';
-import 'babel-polyfill'
 import {apiDomain} from "./options/config";
 
 /*DataBases*/

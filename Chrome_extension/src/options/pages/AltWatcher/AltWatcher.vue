@@ -40,7 +40,7 @@
             </div>
             <div class="card mt-2">
                 <div class="card-body">
-                    <vue-markdown :source="faq"></vue-markdown>
+                    <div v-html="faq"></div>
                 </div>
             </div>
         </div>
@@ -247,8 +247,6 @@
     import {apiDomain} from "../../config";
     import Search from './components/Search.vue'
     import MDCheckbox from '../../components/MDCheckbox/MDCheckbox.vue'
-    import 'babel-polyfill'
-    import VueMarkdown from 'vue-markdown'
     import {sortByUsedTimes} from "../../../utils/utils";
 
 
@@ -269,8 +267,7 @@
         },
         components: {
             Search,
-            MDCheckbox,
-            VueMarkdown
+            MDCheckbox
         },
         mounted() {
             db.open({

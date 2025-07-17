@@ -1,70 +1,60 @@
 <template>
     <div id="altWatcherContainer" v-if="computedLinks.length > 0">
-        <div>
-            <b-button-group style="width: 100%; margin-top: 5px;" size="lg">
-                <b-button
-                        v-if="current"
-                        :href="computedUrl"
-                        target="_blank"
-                        style="width: 100%; text-overflow: ellipsis; max-width: 88%; white-space: nowrap; overflow: hidden;"
-                        v-b-popover:#altWatcherContainer.ds950.hover="computeLink(current.link)"
-                        @click="onCurrentClick"
-                >{{current.title}}</b-button>
-                <b-dropdown @show="onDropDownShow()" :no-flip="computedLinks.length > 5" right text="">
-                    <b-dropdown-item
-                            v-for="link in computedLinks"
-                            :id="'altWatcher_link_' + link.hash_id"
-                            :key="'altWatcher_link_' + link.hash_id"
-                            @click.prevent="setCurrent(link)"
-                            :href="computeLink(link.link)"
-                            :active="link.hash_id === current.hash_id"
-                            title="Popover Title"
+        <div class="button-group">
+            <a
+                v-if="current"
+                :href="computedUrl"
+                target="_blank"
+                class="main-button"
+                @click="onCurrentClick"
+                :title="computeLink(current.link)"
+            >{{current.title}}</a>
+            <div class="dropdown">
+                <button @click="showDropdown = !showDropdown" class="dropdown-button">▼</button>
+                <div v-if="showDropdown" class="dropdown-menu">
+                    <a
+                        v-for="link in computedLinks"
+                        :key="'altWatcher_link_' + link.hash_id"
+                        @click.prevent="setCurrent(link)"
+                        :href="computeLink(link.link)"
+                        class="dropdown-item"
+                        :class="{ active: link.hash_id === current.hash_id }"
                     >
                         <img
-                                v-if="link.favicon"
-                                style="height: 16px; margin-left: -19px; margin-top: 5px; position: fixed;"
-                                :src="link.favicon"
-                                alt=""
-
+                            v-if="link.favicon"
+                            :src="link.favicon"
+                            alt=""
+                            class="favicon"
                         > {{link.title}}
-                    </b-dropdown-item>
-                    <b-popover
-                            v-for="link in computedLinks"
-                            :target="'altWatcher_link_' + link.hash_id"
-                            :key="'altWatcher_link_popover_' + link.hash_id"
-                            triggers="hover focus"
-                            container="#altWatcherContainer"
-                            placement="rightbottom">
-                        <template v-slot:title>{{link.title}}</template>
-                        <p v-if="link.description" style="margin-bottom: 0.5rem;"><b>Описание: </b>{{link.description}}</p>
-                        <p style="word-break: break-all;"><b>URL:</b> <span style="color: #DC3545;">{{computeLink(link.link)}}</span></p>
-                    </b-popover>
-                    <b-dropdown-divider></b-dropdown-divider>
-                    <b-dropdown-item
-                            :active="lang === 'ru'"
-                            @click="onLangChange('ru')"
-                            title="Искать по русскому названию"
+                    </a>
+                    <hr class="dropdown-divider">
+                    <a
+                        @click="onLangChange('ru')"
+                        class="dropdown-item"
+                        :class="{ active: lang === 'ru' }"
+                        title="Искать по русскому названию"
                     >
                         [RU] Искать по русскому названию
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                            @click="onLangChange('en')"
-                            :active="lang === 'en'"
-                            title="Искать по английскому названию"
-                            variant="secondary"
+                    </a>
+                    <a
+                        @click="onLangChange('en')"
+                        class="dropdown-item"
+                        :class="{ active: lang === 'en' }"
+                        title="Искать по английскому названию"
                     >
                         [EN] Искать по английскому названию
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                            v-if="titles.jp"
-                            :active="lang === 'jp'"
-                            @click="lang = 'jp'"
-                            title="Искать по японскому названию"
+                    </a>
+                    <a
+                        v-if="titles.jp"
+                        @click="onLangChange('jp')"
+                        class="dropdown-item"
+                        :class="{ active: lang === 'jp' }"
+                        title="Искать по японскому названию"
                     >
                         [JP] Искать по японскому названию
-                    </b-dropdown-item>
-                </b-dropdown>
-            </b-button-group>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -82,6 +72,7 @@
                 pageType: 0,
                 lang: getAltWatcherLanguage() || "en",
                 bar: false,
+                showDropdown: false,
                 titles: {
                     ru: null,
                     en: null,
@@ -312,10 +303,11 @@
         @import "~bootstrap/scss/button-group";
         @import "~bootstrap/scss/popover";
         @import "~bootstrap/scss/dropdown";
+        @import "~bootstrap/scss/maps";
         @import "~bootstrap/scss/root";
         @import "~bootstrap/scss/reboot";
         @import "~bootstrap/scss/type";
-        @import "~bootstrap-vue/src/index";
+
 
         .dropdown-item.active, .dropdown-item:active {
             background-color: grey !important;

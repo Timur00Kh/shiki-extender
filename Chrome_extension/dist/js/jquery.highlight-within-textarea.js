@@ -5,7 +5,7 @@
  * @github  https://github.com/lonekorean/highlight-within-textarea
  */
 
-(function($) {
+export default function($) {
 	let ID = 'hwt';
 
 	let HighlightWithinTextarea = function($el, config) {
@@ -377,4 +377,4 @@
 			}
 		});
 	};
-})(jQuery);
+};

@@ -76,7 +76,7 @@
         <transition name="fade">
             <div v-if="computedQuery.length > 0" class="card mt-3 mx-2">
                 <ul class="list-group list-group-flush">
-                    <li v-for="link in computedQuery" class="list-group-item">
+                    <li v-for="link in computedQuery" :key="link.id" class="list-group-item">
                         <div class="row justify-content-between">
                             <div class="col-8">
                                 <div class="row">
@@ -150,7 +150,6 @@
 <script>
     import axios from 'axios'
     import {apiDomain} from "../../../config";
-    import 'babel-polyfill'
     import altwatcherLinksDump from './altwatcher_links_dump.json';
 
     export default {

@@ -2,12 +2,13 @@
   "manifest_version": 3,
   "name": "Shiki extender",
   "description": "",
-  "version": "1.0.5",
+  "version": "1.0.2",
   "options_ui": {
     "page": "index.html#options"
   },
   
   "permissions": [
+    "unlimitedStorage",
     "storage"
   ],
 

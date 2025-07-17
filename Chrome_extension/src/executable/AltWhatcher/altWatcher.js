@@ -1,15 +1,7 @@
-import Vue from 'vue'
-import 'babel-polyfill'
+import { createApp } from 'vue'
 import App from './components/App.vue'
-import BootstrapVue from 'bootstrap-vue'
-// import 'bootstrap/dist/css/bootstrap.css'
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-Vue.use(BootstrapVue);
 console.log("---", 'altWatcher initialized');
-import { VBPopover } from 'bootstrap-vue'
-// Note: Vue automatically prefixes the directive name with 'v-'
-Vue.directive('b-popover', VBPopover)
 
 async function start() {
 
@@ -21,22 +13,26 @@ async function start() {
         return;
     }
 
-    if (await new Promise(resolve => chrome.runtime.sendMessage({do: "altWatcherIsEnabled"}, res => resolve(res))) === "false") return;
+    if (await new Promise(resolve => chrome.runtime.sendMessage({ do: "altWatcherIsEnabled" }, res => resolve(res))) === "false") return;
 
     console.log("---", 'altWatcher started');
 
-    $('#altWatcherContainer').remove();
+    const existingContainer = document.getElementById('altWatcherContainer');
+    if (existingContainer) {
+        existingContainer.remove();
+    }
 
-    $('.c-info-right').append(
-        $('<div id="altWatcher"/>')
-    );
+    const infoRight = document.querySelector('.c-info-right');
+    if (infoRight) {
+        const altWatcherDiv = document.createElement('div');
+        altWatcherDiv.id = 'altWatcher';
+        infoRight.appendChild(altWatcherDiv);
+    }
 
-    new Vue({
-        el: '#altWatcher',
-        render: a => a(App)
-    });
+    const app = createApp(App)
+    app.mount('#altWatcher')
 }
 
-$(document).ready(start);
-$(document).on('page:load', start);
-$(document).on('turbolinks:load', start);
+document.addEventListener('DOMContentLoaded', start);
+document.addEventListener('page:load', start);
+document.addEventListener('turbolinks:load', start);
