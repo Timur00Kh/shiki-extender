@@ -242,7 +242,7 @@
 </template>
 
 <script>
-    import db from '../../../libs/db.js'
+    // import db from '../../../libs/db.js'
     import axios from 'axios'
     import {apiDomain} from "../../config";
     import Search from './components/Search.vue'
@@ -270,7 +270,7 @@
             MDCheckbox
         },
         mounted() {
-            db.open({
+            window.db.open({
                 server: 'linksDb',
                 version: 1,
                 schema: {

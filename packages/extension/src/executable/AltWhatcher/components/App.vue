@@ -296,17 +296,17 @@
 
 <style lang="scss">
     #altWatcherContainer {
-        @import "~bootstrap/scss/mixins";
-        @import "~bootstrap/scss/functions";
-        @import "~bootstrap/scss/variables";
-        @import "~bootstrap/scss/buttons";
-        @import "~bootstrap/scss/button-group";
-        @import "~bootstrap/scss/popover";
-        @import "~bootstrap/scss/dropdown";
-        @import "~bootstrap/scss/maps";
-        @import "~bootstrap/scss/root";
-        @import "~bootstrap/scss/reboot";
-        @import "~bootstrap/scss/type";
+        @import "bootstrap/scss/mixins";
+        @import "bootstrap/scss/functions";
+        @import "bootstrap/scss/variables";
+        @import "bootstrap/scss/buttons";
+        @import "bootstrap/scss/button-group";
+        @import "bootstrap/scss/popover";
+        @import "bootstrap/scss/dropdown";
+        @import "bootstrap/scss/maps";
+        @import "bootstrap/scss/root";
+        @import "bootstrap/scss/reboot";
+        @import "bootstrap/scss/type";
 
 
         .dropdown-item.active, .dropdown-item:active {

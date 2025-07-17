@@ -1,3 +1,5 @@
+// DEPRECATED: Этот файл больше не используется. Новый content-script: src/executable/AltWhatcher/altWatcher.js
+// Оставлен для референса.
 // ==UserScript==
 // @name         Alt Watcher v2
 // @namespace    https://vk.com/shiki_ex
@@ -30,12 +32,12 @@ var $ = jQuery.noConflict(true);
 
 function getPrefService(pageType) {
     var matches = document.cookie.match(new RegExp('(?:^|; )altWatcherPrefServiceFor' + pageType + '=([^;]*)'));
-    if (matches){
+    if (matches) {
         matches = decodeURIComponent(matches[1]);
-        matches = selections.find(function(it){
+        matches = selections.find(function (it) {
             return it[1] == matches;
         });
-        if (matches && matches[2] & pageType) return  matches;
+        if (matches && matches[2] & pageType) return matches;
     }
 
     for (var i = 0, v = selections[i]; i < selections.length; v = selections[++i])
@@ -53,7 +55,7 @@ function setPrefService(pageType, value) {
 
 function getAltWatcherLanguage() {
     var matches = document.cookie.match(new RegExp('(?:^|; )altWatcherLanguage=([^;]*)'));
-    if (matches){
+    if (matches) {
         matches = decodeURIComponent(matches[1]);
         return matches;
     }
@@ -66,14 +68,14 @@ function setAltWatcherLanguage(value) {
     document.cookie = "altWatcherLanguage=" + encodeURIComponent(value) + "; path=/; expires=" + d.toUTCString();
 }
 
-function start(){
+function start() {
     // if (window.location.pathname.indexOf("animes") && ($(".disabled").length || !$(".watch-online-placeholer").children().length)) {
     let lang = getAltWatcherLanguage();
     var animeName = $("#animes_show > section > div > header > h1").text().split(" / ")[lang === "en" ? 1 : 0],
         link = $('<a target="_blank"/>'),
         bar = $('<div/>'),
         pageType = (!!$('a.b-tag[href*="genre/12"]').length + 1),
-        barItemClicked = function (){
+        barItemClicked = function () {
             let lang = getAltWatcherLanguage();
             let animeName = $("#animes_show > section > div > header > h1").text().split(" / ")[lang === "en" ? 1 : 0];
             var i = selections[$(this).data('service-index')];
@@ -88,31 +90,31 @@ function start(){
             bar.append($('<a/>').addClass('b-link_button dark watch-online').text(v[1]).data('service-index', i).click(barItemClicked));
     }
 
-    let en = $('<a>').addClass(lang === "en" ? "b-link_button dark" : "b-link_button").text('en').attr('title', "Искать по английскому названию").css({minWidth: 0});
-    let ru = $('<a>').addClass(lang === "ru" ? "b-link_button dark" : "b-link_button").text('ru').attr('title', "Искать по русскому названию").css({minWidth: 0});
+    let en = $('<a>').addClass(lang === "en" ? "b-link_button dark" : "b-link_button").text('en').attr('title', "Искать по английскому названию").css({ minWidth: 0 });
+    let ru = $('<a>').addClass(lang === "ru" ? "b-link_button dark" : "b-link_button").text('ru').attr('title', "Искать по русскому названию").css({ minWidth: 0 });
     let table = $('<table width="100%"/>').append($('<tr/>')
-        .append($('<td/>').append(ru.click(function() {
+        .append($('<td/>').append(ru.click(function () {
             ru.addClass("dark")
             en.removeClass("dark")
             setAltWatcherLanguage("ru")
             start();
         })))
-        .append($('<td/>').append(en.click(function(){
+        .append($('<td/>').append(en.click(function () {
             en.addClass("dark")
             ru.removeClass("dark")
             setAltWatcherLanguage("en")
             start();
         }))));
 
-    bar.append($('<div/>').addClass('block watch-online').css({top: "5px"}).append(table));
+    bar.append($('<div/>').addClass('block watch-online').css({ top: "5px" }).append(table));
 
 
     i = getPrefService(pageType);
     $('#altWatcher_userscript').remove();
     $('#altWatcher_userscript_block').remove();
     $("#animes_show > section > div:nth-child(1) > div.menu-slide-outer.x199 > div > div > div.block > div.b-db_entry > div.c-about > div > div.c-info-right").append(
-        $('<div/>').css({'textAlign': 'center'}).attr('id', 'altWatcher_userscript').append(
-            $('<div/>').css({display: 'inline-flex'}).append(
+        $('<div/>').css({ 'textAlign': 'center' }).attr('id', 'altWatcher_userscript').append(
+            $('<div/>').css({ display: 'inline-flex' }).append(
                 link.addClass("b-link_button dark")
                     .attr('href', i[0] + encodeURIComponent(animeName)).text('Смотреть на ' + i[1])
             ).append(
@@ -124,7 +126,7 @@ function start(){
                 })
             )
         )
-            .append(bar.addClass('block').css({marginBottom: 0}).attr('id', 'altWatcher_userscript_block').hide())
+            .append(bar.addClass('block').css({ marginBottom: 0 }).attr('id', 'altWatcher_userscript_block').hide())
             .append($('<br/>'))
             .append(
                 $('<a/>')
