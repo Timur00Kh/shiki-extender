@@ -11,7 +11,7 @@
                             <MDToggle
                                     class="mt-2"
                                     :checked="altWatcher"
-                                    :onChange="() => altWatcher = !altWatcher"
+                                    :onChange="() => altWatcher.value = !altWatcher.value"
                             />
                         </div>
                         <div class="col-auto">
@@ -43,47 +43,33 @@
     </div>
 </template>
 
-<script>
-    import MDToggle from '../components/MDToggle/MDToggle.vue'
+<script setup>
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import MDToggle from '../components/MDToggle/MDToggle.vue'
 
-    export default {
-        name: "options",
-        components: {
-            MDToggle
-        },
-        data() {
-            console.log(this.$route);
-            return {
-                altWatcher: isEnabled('altWatcher'),
-                shikiDump: isEnabled('shikiDump'),
-                popup: this.$route.query.popup
-            }
-        },
-        methods: {
-            getChromePath(file) {
-                return getChromePath(file)
-            }
-        },
-        watch: {
-            altWatcher() {
-                localStorage.setItem("altWatcher", this.altWatcher)
-            }
-        }
-    }
+const route = useRoute()
+const popup = route.query.popup
 
-    function isEnabled(key, def) {
-        let res =  localStorage.getItem(key);
-        if (res === null) {
-            res = def || true;
-        } else {
-            res = (res === 'true');
-        }
-        return res;
+function isEnabled(key, def) {
+    let res = localStorage.getItem(key);
+    if (res === null) {
+        res = def || true;
+    } else {
+        res = (res === 'true');
     }
+    return res;
+}
 
-    function getChromePath(file) {
-        return chrome.runtime.getURL(file)
-    }
+function getChromePath(file) {
+    return chrome.runtime.getURL(file)
+}
+
+const altWatcher = ref(isEnabled('altWatcher'))
+
+watch(altWatcher, (val) => {
+    localStorage.setItem('altWatcher', val)
+})
 </script>
 
 <style scoped>

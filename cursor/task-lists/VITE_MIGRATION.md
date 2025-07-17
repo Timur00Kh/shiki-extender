@@ -18,11 +18,15 @@
 - [x] Настроить vite-plugin-static-copy для копирования библиотек в dist/libs
 - [x] Настроить index.html на подключение библиотек из dist/libs
 - [x] Устранить ошибки CSP и ESM/UMD (jQuery, highlight-within-textarea)
+- [x] Мигрировать App.vue (AltWatcher) на Composition API
+- [x] Исправить баг с подстановкой {{title}} в computeLink (корректная генерация ссылок)
 
 ## In Progress Tasks
 
 - [ ] Обеспечить SPA для popup, options, вкладки
 - [ ] Проверить сборку и работоспособность (npm run dev/build)
+- [ ] Вынести вспомогательные функции и логику из App.vue в utils/composables
+- [ ] Перепроверить и доработать функцию computeLink для всех кейсов генерации ссылок ({{title}}, {{id}}, {{episode}})
 
 ## Future Tasks
 
@@ -41,8 +45,10 @@
 3. Создать manifest.config.ts с entry: background, content_scripts, popup, options, web_accessible_resources.
 4. Настроить src/: background.js (idb), executable/AltWhatcher/altWatcher.js, options/options.js, index.html.
 5. Обеспечить SPA для popup, options, вкладки.
-6. Проверить сборку и работоспособность.
-7. Подготовить к дальнейшему рефакторингу (TS, Composition API, модули).
+6. Мигрировать крупные компоненты на Composition API (App.vue/AltWatcher — done).
+7. Вынести бизнес-логику и утилиты в composables/utils.
+8. Проверить сборку и работоспособность.
+9. Подготовить к дальнейшему рефакторингу (TS, Composition API, модули).
 
 ### Relevant Files
 
@@ -56,3 +62,4 @@
 - packages/extension/dist/libs/jquery.min.js — Локальная jQuery ✅
 - packages/extension/dist/libs/jquery.highlight-within-textarea.js — Локальный плагин ✅
 - packages/extension/dist/libs/db.js — Локальная библиотека IndexedDB ✅ 
+- packages/extension/src/executable/AltWhatcher/components/App.vue — AltWatcher (Composition API) ✅ 
