@@ -9,6 +9,7 @@
 - ❌ `QUICK_START.md` - Быстрый старт с GitHub Actions  
 - ❌ `README_GITHUB_ACTIONS.md` - Обзор GitHub Actions
 - ❌ `SUMMARY.md` - Итоговый обзор GitHub Actions
+- ❌ `docs/GITHUB_ACTIONS_SETUP.md` - Настройка GitHub Actions
 
 ### Временные файлы
 - ❌ `CLEANUP.md` - Инструкции по очистке после миграции
