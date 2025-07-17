@@ -1,9 +1,9 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 const args = require('minimist')(process.argv.slice(2));
-const {dbConfig} = require(args.DB_CONFIG || '../../config/db_config');
+const { dbConfig } = require(args.DB_CONFIG || '../../config/db_config');
 const pg = new Pool(dbConfig);
 pg.connect();
 
@@ -27,15 +27,15 @@ const SQL_SELECT_LINK = `SELECT *
 router.get('/link', async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');
     try {
-        const {title = '', manga = 0, anime = 0, ranobe = 0, approved = true} = request.query;
+        const { title = '', manga = 0, anime = 0, ranobe = 0, approved = true } = request.query;
         let links;
         console.log('---/link', [title, manga, anime, ranobe, approved]);
 
         if (approved === 'true') {
-            let {rows} = await pg.query(SQL_SELECT_LINK_APPROVED, [title, manga, anime, ranobe, approved]);
+            let { rows } = await pg.query(SQL_SELECT_LINK_APPROVED, [title, manga, anime, ranobe, approved]);
             links = rows;
         } else {
-            let {rows} = await pg.query(SQL_SELECT_LINK, [title, manga, anime, ranobe]);
+            let { rows } = await pg.query(SQL_SELECT_LINK, [title, manga, anime, ranobe]);
             links = rows;
         }
         response.json(links);
@@ -50,18 +50,18 @@ const SQL_INSERT_LINK = `INSERT INTO altwatcher_link (title, link, description, 
 router.post('/link', async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');
     try {
-        const {title, link, description, manga = 0, anime = 0, ranobe = 0} = request.body;
+        const { title, link, description, manga = 0, anime = 0, ranobe = 0 } = request.body;
         if (!title) {
-            response.status(400).json({error: 'title is not present'});
+            response.status(400).json({ error: 'title is not present' });
             return;
         }
         if (!link) {
-            response.status(400).json({error: 'link is not present'});
+            response.status(400).json({ error: 'link is not present' });
             return;
         }
 
 
-        let {rows: res} = await pg.query(SQL_INSERT_LINK, [title, link, description, manga, anime, ranobe]);
+        let { rows: res } = await pg.query(SQL_INSERT_LINK, [title, link, description, manga, anime, ranobe]);
         console.log('---res', res);
         console.log('---res', Number(res[0].id));
         response.json({
@@ -94,7 +94,7 @@ router.get('/defaultLinks', async (request, response) => {
     response.set('Access-Control-Allow-Origin', '*');
     try {
         console.log(`/defaultLinks`);
-        let {rows} = await pg.query(SQL_SELECT_DEFAULT);
+        let { rows } = await pg.query(SQL_SELECT_DEFAULT);
         response.json(rows);
     } catch (e) {
         console.error(e);

@@ -20,9 +20,9 @@ if (!versionRegex.test(version)) {
   process.exit(1);
 }
 
-const srcDir = path.join(__dirname, '..', 'Chrome_extension', 'src');
-const distDir = path.join(__dirname, '..', 'Chrome_extension', 'dist');
-const manifestPath = path.join(srcDir, 'manifest.json');
+const extensionDir = path.join(__dirname, '..', 'packages', 'extension');
+const distDir = path.join(extensionDir, 'dist');
+const manifestPath = path.join(extensionDir, 'src', 'manifest.json');
 
 try {
   // Читаем текущую версию из manifest.json
@@ -68,7 +68,7 @@ try {
   // Собираем расширение
   console.log('📦 Building extension...');
   execSync('npm run build', { 
-    cwd: srcDir, 
+    cwd: extensionDir, 
     stdio: 'inherit' 
   });
   

@@ -19,9 +19,14 @@ if (!versionRegex.test(newVersion)) {
   process.exit(1);
 }
 
-const srcDir = path.join(__dirname, '..', 'Chrome_extension', 'src');
-const manifestPath = path.join(srcDir, 'manifest.json');
-const packagePath = path.join(srcDir, 'package.json');
+const extensionDir = path.join(__dirname, '..', 'packages', 'extension');
+const serverDir = path.join(__dirname, '..', 'packages', 'server');
+const rootDir = path.join(__dirname, '..');
+
+const manifestPath = path.join(extensionDir, 'src', 'manifest.json');
+const extensionPackagePath = path.join(extensionDir, 'package.json');
+const serverPackagePath = path.join(serverDir, 'package.json');
+const rootPackagePath = path.join(rootDir, 'package.json');
 
 function updateFile(filePath, updater) {
   try {
@@ -31,9 +36,9 @@ function updateFile(filePath, updater) {
     const updatedData = updater(data);
     
     fs.writeFileSync(filePath, JSON.stringify(updatedData, null, 2));
-    console.log(`✅ Updated ${path.basename(filePath)}`);
+    console.log(`✅ Updated ${path.relative(rootDir, filePath)}`);
   } catch (error) {
-    console.error(`❌ Error updating ${path.basename(filePath)}:`, error.message);
+    console.error(`❌ Error updating ${path.relative(rootDir, filePath)}:`, error.message);
     process.exit(1);
   }
 }
@@ -44,8 +49,18 @@ updateFile(manifestPath, (manifest) => {
   return manifest;
 });
 
-// Обновляем package.json
-updateFile(packagePath, (pkg) => {
+// Обновляем package.json файлы
+updateFile(extensionPackagePath, (pkg) => {
+  pkg.version = newVersion;
+  return pkg;
+});
+
+updateFile(serverPackagePath, (pkg) => {
+  pkg.version = newVersion;
+  return pkg;
+});
+
+updateFile(rootPackagePath, (pkg) => {
   pkg.version = newVersion;
   return pkg;
 });
