@@ -1,20 +1,28 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Shiki extender",
   "description": "",
-  "version": "1.0.4",
-  "options_page": "index.html#options",
+  "version": "1.0.5",
+  "options_ui": {
+    "page": "index.html#options"
+  },
   
   "permissions": [
-    "unlimitedStorage"
+    "storage"
   ],
 
   "web_accessible_resources": [
-    "*.js.map",
-    "http://185.189.13.136"
+    {
+      "resources": ["*.js.map"],
+      "matches": ["*://shikimori.one/*", "*://shikimori.org/*"]
+    },
+    {
+      "resources": ["http://185.189.13.136"],
+      "matches": ["*://shikimori.one/*", "*://shikimori.org/*"]
+    }
   ],
 
-  "browser_action": {
+  "action": {
     "default_title": "Shiki extender",
     "default_popup": "index.html#options?popup=true"
   },
@@ -31,10 +39,7 @@
     }
   ],
 
-
   "background": {
-    "scripts": [
-      "background-bundle.js"
-    ]
+    "service_worker": "background-bundle.js"
   }
 }

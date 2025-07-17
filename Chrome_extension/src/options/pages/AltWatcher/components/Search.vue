@@ -151,6 +151,7 @@
     import axios from 'axios'
     import {apiDomain} from "../../../config";
     import 'babel-polyfill'
+    import altwatcherLinksDump from './altwatcher_links_dump.json';
 
     export default {
         name: "Search",
@@ -186,7 +187,7 @@
                     tags,
                     description,
                 });
-                axios.get(`${apiDomain}/altWatcher/link/${id}/inc-num-of-downloads`)
+                // axios.get(`${apiDomain}/altWatcher/link/${id}/inc-num-of-downloads`)
             },
             onMoreButtonClick(id) {
                 let cur = this.query.find(e => e.id === id);
@@ -196,12 +197,20 @@
                 this.loading = true;
 
                 let params = this.params;
-                let {data: query} = await this.search(params);
-                this.query = query.map(e => ({
-                    ...e,
-                    more: false // свойство, отвечающее за показ сройлера с описанием
-                }))
-
+                this.query = altwatcherLinksDump
+                        .filter(e => {
+                            let match = true;
+                            if (params.title && !e.title.toLowerCase().includes(params.title.toLowerCase())) match = false;
+                            if (params.manga && !(e.manga & params.manga)) match = false;
+                            if (params.anime && !(e.anime & params.anime)) match = false;
+                            if (params.ranobe && !(e.ranobe & params.ranobe)) match = false;
+                            if (params.approved && !e.approved) match = false;
+                            return match;
+                        })
+                        .map(e => ({
+                            ...e,
+                            more: false
+                        }));
                 setTimeout(() => {
                     this.loading = false;
                 }, 500)
