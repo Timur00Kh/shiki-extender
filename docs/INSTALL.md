@@ -3,16 +3,17 @@
 ## Системные требования
 
 ### Минимальные требования:
-- **Node.js** версии 12.0.0 или выше
+- **Node.js** версии 14.0.0 или выше (для npm workspaces)
+- **npm** версии 7.0.0 или выше (для workspaces)
 - **PostgreSQL** версии 10.0 или выше
 - **Chrome браузер** версии 80 или выше
 - **Git** для клонирования репозитория
 
 ### Рекомендуемые требования:
-- **Node.js** версии 16.0.0 или выше
+- **Node.js** версии 18.0.0 или выше
+- **npm** версии 8.0.0 или выше
 - **PostgreSQL** версии 13.0 или выше
 - **Chrome браузер** версии 90 или выше
-- **npm** версии 6.0.0 или выше
 
 ## Установка
 
@@ -23,7 +24,19 @@ git clone <repository-url>
 cd shiki-extender
 ```
 
-### 2. Установка PostgreSQL
+### 2. Установка зависимостей (npm workspaces)
+
+```bash
+# Установка зависимостей для всех пакетов
+npm install
+```
+
+Эта команда установит зависимости для:
+- Корневого проекта
+- `packages/server/` 
+- `packages/extension/`
+
+### 3. Установка PostgreSQL
 
 #### Ubuntu/Debian:
 ```bash
@@ -47,7 +60,7 @@ brew services start postgresql
 #### Windows:
 Скачайте и установите с официального сайта: https://www.postgresql.org/download/windows/
 
-### 3. Настройка базы данных
+### 4. Настройка базы данных
 
 #### Создание пользователя и базы данных:
 
@@ -71,48 +84,42 @@ GRANT ALL PRIVILEGES ON DATABASE shiki_extender TO shiki_user;
 #### Применение схемы базы данных:
 
 ```bash
-# Подключение к базе данных и выполнение SQL скрипта
-psql -U shiki_user -d shiki_extender -f NodeServer/modules/altWatcher/link_table.sql
+# Используйте SQL файл из server пакета
+psql -U shiki_user -d shiki_extender -f packages/server/db_backups/shiki_ex_public_altwatcher_link.sql
 ```
 
-### 4. Настройка сервера
-
-#### Установка зависимостей:
-
-```bash
-cd NodeServer
-npm install
-```
+### 5. Настройка сервера
 
 #### Создание конфигурационного файла:
 
 ```bash
-# Создание директории для конфигурации
-mkdir -p config
+# Файл конфигурации уже создан в packages/server/config/db_config.js
+# Отредактируйте его с вашими настройками:
 
-# Создание файла конфигурации
-cat > config/db_config.js << EOF
-module.exports = {
-    dbConfig: {
-        host: 'localhost',
-        port: 5432,
-        database: 'shiki_extender',
-        user: 'shiki_user',
-        password: 'your_password',
-        max: 20, // максимальное количество соединений
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
-    }
-};
-EOF
+nano packages/server/config/db_config.js
 ```
 
-**Важно:** Замените `your_password` на пароль, который вы указали при создании пользователя PostgreSQL.
+Пример конфигурации:
+```javascript
+module.exports = {
+  dbConfig: {
+    host: 'localhost',
+    port: 5432,
+    database: 'shiki_extender',
+    user: 'shiki_user',
+    password: 'your_password',
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  }
+};
+```
 
 #### Проверка конфигурации:
 
 ```bash
 # Тест подключения к базе данных
+cd packages/server
 node -e "
 const {dbConfig} = require('./config/db_config');
 const {Pool} = require('pg');
@@ -128,10 +135,17 @@ pg.query('SELECT NOW()', (err, res) => {
 "
 ```
 
-### 5. Запуск сервера
+### 6. Запуск сервера
 
-#### Разработка:
+#### Через npm workspaces (рекомендуется):
 ```bash
+# Из корня проекта
+npm run start:server
+```
+
+#### Напрямую:
+```bash
+cd packages/server
 npm start
 ```
 
@@ -141,6 +155,7 @@ npm start
 npm install -g pm2
 
 # Запуск с PM2
+cd packages/server
 pm2 start shiki_ex_server.js --name "shiki-server"
 
 # Автозапуск при перезагрузке
@@ -152,22 +167,24 @@ pm2 save
 
 ```bash
 # Тест API
-curl "http://localhost:8081/altWatcher/faq"
+curl "http://localhost:81/altWatcher/faq"
 ```
 
-### 6. Сборка и установка расширения
+### 7. Сборка и установка расширения
 
-#### Установка зависимостей:
+#### Сборка через npm workspaces (рекомендуется):
 
 ```bash
-cd Chrome_extension/src
-npm install
+# Из корня проекта
+npm run build:extension
+
+# Или для разработки
+npm run dev:extension
 ```
 
-#### Сборка расширения:
-
+#### Напрямую:
 ```bash
-# Сборка для разработки
+cd packages/extension
 npm run build
 
 # Или сборка с отслеживанием изменений
@@ -179,17 +196,17 @@ npm run watch
 1. Откройте Chrome и перейдите в `chrome://extensions/`
 2. Включите "Режим разработчика" (переключатель в правом верхнем углу)
 3. Нажмите "Загрузить распакованное расширение"
-4. Выберите папку `Chrome_extension/dist`
+4. Выберите папку `packages/extension/dist`
 5. Расширение должно появиться в списке
 
-### 7. Настройка переменных окружения (опционально)
+### 8. Настройка переменных окружения (опционально)
 
-Создайте файл `.env` в корне проекта:
+Создайте файл `.env` в `packages/server/`:
 
 ```bash
-# .env
+# packages/server/.env
 NODE_ENV=development
-PORT=8081
+PORT=81
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=shiki_extender
@@ -203,10 +220,10 @@ DB_PASSWORD=your_password
 
 ```bash
 # Проверка статуса сервера
-curl -I http://localhost:8081/altWatcher/faq
+curl -I http://localhost:81/altWatcher/faq
 
 # Проверка API поиска
-curl "http://localhost:8081/altWatcher/link?anime=1"
+curl "http://localhost:81/altWatcher/link?anime=1"
 ```
 
 ### 2. Проверка расширения
@@ -215,75 +232,104 @@ curl "http://localhost:8081/altWatcher/link?anime=1"
 2. На любой странице аниме/манги должно появиться расширение
 3. Проверьте, что расширение работает корректно
 
-### 3. Проверка базы данных
+### 3. Проверка workspaces
 
 ```bash
-# Подключение к БД
-psql -U shiki_user -d shiki_extender
+# Проверка что workspaces настроены
+npm ls --workspaces --depth=0
 
-# Проверка таблицы
-\dt altwatcher_link
+# Проверка сборки через workspaces
+npm run build
+```
 
-# Проверка данных
-SELECT * FROM altwatcher_link LIMIT 5;
+## Команды для разработки
 
-# Выход
-\q
+### Основные команды (из корня проекта):
+
+```bash
+# Установка зависимостей
+npm install
+
+# Сборка всех пакетов
+npm run build
+
+# Запуск сервера
+npm run start:server
+
+# Сборка расширения
+npm run build:extension
+
+# Разработка расширения
+npm run dev:extension
+
+# Линтинг
+npm run lint
+
+# Очистка
+npm run clean
+```
+
+### Управление версиями:
+
+```bash
+# Обновить версию всех пакетов
+node scripts/bump-version.js 1.0.1
+
+# Создать релиз
+node scripts/create-release.js 1.0.1
 ```
 
 ## Устранение неполадок
 
+### Проблемы с workspaces
+
+**Ошибка: "workspaces not supported"**
+```bash
+# Проверка версий
+node --version  # Должно быть >= 14
+npm --version   # Должно быть >= 7
+
+# Обновление npm
+npm install -g npm@latest
+```
+
 ### Проблемы с PostgreSQL
 
-**Ошибка: "connection refused"**
+**Ошибка: "Cannot find module '../config/db_config'"**
 ```bash
-# Проверка статуса PostgreSQL
-sudo systemctl status postgresql
+# Проверка файла конфигурации
+ls -la packages/server/config/db_config.js
 
-# Запуск PostgreSQL
-sudo systemctl start postgresql
+# Создание файла если отсутствует
+cp packages/server/config/db_config.js.example packages/server/config/db_config.js
 ```
 
-**Ошибка: "authentication failed"**
-```bash
-# Проверка файла pg_hba.conf
-sudo nano /etc/postgresql/*/main/pg_hba.conf
+### Проблемы с сборкой
 
-# Изменение метода аутентификации на md5
-# local   all             all                                     md5
-```
-
-### Проблемы с Node.js
-
-**Ошибка: "module not found"**
+**Ошибка: "webpack command not found"**
 ```bash
 # Переустановка зависимостей
-rm -rf node_modules package-lock.json
+npm install
+
+# Или установка в конкретный пакет
+cd packages/extension
 npm install
 ```
 
-**Ошибка: "port already in use"**
-```bash
-# Поиск процесса, использующего порт
-lsof -i :8081
-
-# Завершение процесса
-kill -9 <PID>
-```
-
-### Проблемы с расширением
-
-**Расширение не загружается:**
-1. Проверьте консоль браузера на ошибки
-2. Убедитесь, что сервер запущен
-3. Проверьте CORS настройки
-
-**Расширение не работает на Shikimori:**
-1. Проверьте manifest.json - правильные ли домены указаны
-2. Убедитесь, что content script загружается
-3. Проверьте консоль на странице Shikimori
-
 ## Обновление
+
+### Обновление всего проекта
+
+```bash
+# Обновление кода
+git pull origin main
+
+# Переустановка зависимостей
+npm install
+
+# Пересборка
+npm run build
+```
 
 ### Обновление сервера
 
@@ -291,94 +337,32 @@ kill -9 <PID>
 # Остановка сервера
 pm2 stop shiki-server
 
-# Обновление кода
+# Обновление
 git pull origin main
-
-# Переустановка зависимостей
-cd NodeServer
 npm install
 
-# Запуск сервера
+# Запуск
 pm2 start shiki-server
 ```
 
-### Обновление расширения
+## Структура проекта
 
-```bash
-# Обновление кода
-git pull origin main
-
-# Пересборка расширения
-cd Chrome_extension/src
-npm run build
-
-# Обновление в Chrome
-# Перейдите в chrome://extensions/ и нажмите "Обновить"
 ```
-
-## Резервное копирование
-
-### База данных
-
-```bash
-# Создание резервной копии
-pg_dump -U shiki_user shiki_extender > backup_$(date +%Y%m%d_%H%M%S).sql
-
-# Восстановление из резервной копии
-psql -U shiki_user -d shiki_extender < backup_file.sql
-```
-
-### Конфигурация
-
-```bash
-# Резервное копирование конфигурации
-cp NodeServer/config/db_config.js backup_db_config.js
-
-# Восстановление конфигурации
-cp backup_db_config.js NodeServer/config/db_config.js
-```
-
-## Безопасность
-
-### Рекомендации по безопасности
-
-1. **Измените пароль по умолчанию** для пользователя PostgreSQL
-2. **Ограничьте доступ к базе данных** только с нужных IP адресов
-3. **Используйте HTTPS** в продакшене
-4. **Регулярно обновляйте** зависимости
-5. **Мониторьте логи** на подозрительную активность
-
-### Настройка файрвола
-
-```bash
-# Ubuntu/Debian
-sudo ufw allow 8081/tcp
-
-# CentOS/RHEL
-sudo firewall-cmd --permanent --add-port=8081/tcp
-sudo firewall-cmd --reload
-```
-
-## Мониторинг
-
-### Логи сервера
-
-```bash
-# Просмотр логов PM2
-pm2 logs shiki-server
-
-# Просмотр логов PostgreSQL
-sudo tail -f /var/log/postgresql/postgresql-*.log
-```
-
-### Метрики
-
-```bash
-# Статус PM2 процессов
-pm2 status
-
-# Использование ресурсов
-pm2 monit
+shiki-extender/
+├── packages/
+│   ├── server/              # Node.js сервер
+│   │   ├── config/         # Конфигурация БД
+│   │   ├── modules/        # API модули
+│   │   ├── db_backups/     # SQL схемы
+│   │   └── package.json
+│   └── extension/          # Chrome расширение
+│       ├── src/           # Исходный код
+│       ├── dist/          # Собранные файлы
+│       ├── webpack.config.js
+│       └── package.json
+├── scripts/                # Скрипты управления
+├── docs/                   # Документация
+└── package.json           # Root workspaces
 ```
 
 ## Дополнительная документация
@@ -386,3 +370,4 @@ pm2 monit
 - [Руководство разработчика](DEVELOPMENT.md) - подробная информация для разработчиков
 - [API документация](API.md) - описание API endpoints
 - [FAQ](FAQ.md) - часто задаваемые вопросы
+- [Быстрый старт](quick-start.md) - краткое руководство
