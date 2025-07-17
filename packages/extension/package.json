@@ -21,7 +21,6 @@
     "@traptitech/markdown-it-katex": "^3.6.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
-    "bootstrap-vue": "^2.23.1",
     "highlight-within-textarea": "^2.0.5",
     "idb": "^8.0.3",
     "jquery": "^3.7.1",

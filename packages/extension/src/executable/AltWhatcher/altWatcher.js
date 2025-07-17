@@ -3,9 +3,9 @@ import App from './components/App.vue'
 
 console.log("---", 'altWatcher initialized');
 
+let app = null;
+
 async function start() {
-
-
     if (
         !['/animes/', '/mangas/', '/ranobe/']
             .reduce((sum, e) => ~window.location.pathname.indexOf(e) ? true : sum, false)
@@ -17,9 +17,25 @@ async function start() {
 
     console.log("---", 'altWatcher started');
 
+    // Очистка предыдущего экземпляра для HMR
+    if (app) {
+        try {
+            app.unmount();
+        } catch (e) {
+            console.log('App unmount error:', e);
+        }
+        app = null;
+    }
+
+    // Удаление существующего контейнера
     const existingContainer = document.getElementById('altWatcherContainer');
     if (existingContainer) {
         existingContainer.remove();
+    }
+
+    const existingAltWatcher = document.getElementById('altWatcher');
+    if (existingAltWatcher) {
+        existingAltWatcher.remove();
     }
 
     const infoRight = document.querySelector('.c-info-right');
@@ -27,10 +43,19 @@ async function start() {
         const altWatcherDiv = document.createElement('div');
         altWatcherDiv.id = 'altWatcher';
         infoRight.appendChild(altWatcherDiv);
-    }
 
-    const app = createApp(App)
-    app.mount('#altWatcher')
+        // Создание нового приложения
+        app = createApp(App);
+        app.mount('#altWatcher');
+    }
+}
+
+// Hot Module Replacement поддержка
+if (import.meta.hot) {
+    import.meta.hot.accept('./components/App.vue', () => {
+        console.log('HMR: App.vue updated, restarting...');
+        start();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', start);
