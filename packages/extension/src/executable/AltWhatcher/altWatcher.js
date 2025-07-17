@@ -36,3 +36,4 @@ async function start() {
 document.addEventListener('DOMContentLoaded', start);
 document.addEventListener('page:load', start);
 document.addEventListener('turbolinks:load', start);
+setTimeout(start, 2000);

@@ -20,6 +20,9 @@
 - [x] Устранить ошибки CSP и ESM/UMD (jQuery, highlight-within-textarea)
 - [x] Мигрировать App.vue (AltWatcher) на Composition API
 - [x] Исправить баг с подстановкой {{title}} в computeLink (корректная генерация ссылок)
+- [x] Вынести генерацию ссылок и паттернов в отдельный модуль (src/utils/linkPattern.js)
+- [x] Интегрировать модуль генерации ссылок и паттернов во все компоненты (App.vue, AltWatcher.vue и др.)
+- [x] Почистить шаблоны компонентов от .value (Vue 3 best practices)
 
 ## In Progress Tasks
 
@@ -62,4 +65,5 @@
 - packages/extension/dist/libs/jquery.min.js — Локальная jQuery ✅
 - packages/extension/dist/libs/jquery.highlight-within-textarea.js — Локальный плагин ✅
 - packages/extension/dist/libs/db.js — Локальная библиотека IndexedDB ✅ 
-- packages/extension/src/executable/AltWhatcher/components/App.vue — AltWatcher (Composition API) ✅ 
+- packages/extension/src/executable/AltWhatcher/components/App.vue — AltWatcher (Composition API) ✅
+- packages/extension/src/utils/linkPattern.js — Генерация ссылок и паттернов ✅ 

@@ -248,6 +248,7 @@
     import Search from './components/Search.vue'
     import MDCheckbox from '../../components/MDCheckbox/MDCheckbox.vue'
     import {sortByUsedTimes} from "../../../utils/utils";
+    import { computeLink } from '../../../utils/linkPattern';
 
 
 

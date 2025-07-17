@@ -3,11 +3,11 @@
         <div class="button-group">
             <a
                 v-if="current"
-                :href="computedUrl"
+                :href="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
                 target="_blank"
                 class="main-button"
                 @click="onCurrentClick"
-                :title="computeLink(current.link)"
+                :title="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
             >{{current.title}}</a>
             <div class="dropdown">
                 <button @click="showDropdown = !showDropdown" class="dropdown-button">▼</button>
@@ -16,7 +16,7 @@
                         v-for="link in computedLinks"
                         :key="'altWatcher_link_' + link.hash_id"
                         @click.prevent="setCurrent(link)"
-                        :href="computeLink(link.link)"
+                        :href="computeLink(link.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
                         class="dropdown-item"
                         :class="{ active: link.hash_id === current.hash_id }"
                     >
@@ -62,6 +62,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { sortByUsedTimes } from '../../../utils/utils';
+import { computeLink } from '../../../utils/linkPattern';
 
 // Вспомогательные функции (позже вынести в utils)
 function encodeName(name, encoding) {
@@ -122,6 +123,14 @@ const lang = ref(getAltWatcherLanguage() || 'en');
 const bar = ref(false);
 const showDropdown = ref(false);
 const titles = ref({ ru: null, en: null, jp: null });
+
+const linkValues = computed(() => {
+    return {
+        title: titles.value[lang.value],
+        id: window.location.href.split('/')[4].match(/([0-9]+)/g)[0],
+        episode: document.querySelector('.current-episodes') ? Number(document.querySelector('.current-episodes').innerText) + 1 : 1,
+    }
+});
 
 // Логика
 function onDropDownShow(e) {
@@ -187,33 +196,8 @@ function parseTitles() {
     titles.value.jp = jp;
 }
 function openInNewTab(link) {
-    var win = window.open(computeLink(link.link), '_blank');
+    var win = window.open(computeLink(link.link, { title: titles.value[lang.value], id: linkValues.value.id, episode: linkValues.value.episode }), '_blank');
     win.focus();
-}
-function computeLink(link) {
-    let idMatch = ~link.indexOf('{{id}}');
-    let epMatch = ~link.indexOf('{{episode}}');
-
-    if (idMatch) {
-        let id = window.location.href.split('/')[4].match(/([0-9]+)/g)[0];
-        link = link.replace('{{id}}', id)
-    }
-
-    if (epMatch) {
-        let episodeContainer = document.querySelector('.current-episodes');
-        link = link.replace('{{episode}}', episodeContainer ? Number(episodeContainer.innerText) + 1 : 1)
-    }
-
-
-    let titleNameMatch = link.match(/\{\{title=?(.+?)\}\}/);
-    let titleName = encodeName(titles.value[lang.value], titleNameMatch ? titleNameMatch[1] : '');
-    if (titleNameMatch) {
-        link = link.replace((/\{\{title=?(.+?)\}\}/g), titleName)
-    }
-    if (!idMatch && !epMatch && !titleNameMatch){
-        link += titleName;
-    }
-    return link;
 }
 function onLangChange(l) {
     lang.value = l;
@@ -242,7 +226,7 @@ const computedLinks = computed(() => {
     cl.sort(sortByUsedTimes);
     return cl;
 });
-const computedUrl = computed(() => current.value ? computeLink(current.value.link) : '');
+const computedUrl = computed(() => current.value ? computeLink(current.value.link, { title: titles.value[lang.value], id: linkValues.value.id, episode: linkValues.value.episode }) : '');
 
 onMounted(() => {
     console.log('---', 'AltWatcher mounted');
