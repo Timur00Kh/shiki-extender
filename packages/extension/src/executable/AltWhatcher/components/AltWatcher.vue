@@ -4,10 +4,10 @@
             <a 
                 v-if="current"
                 @click="onCurrentClick"
-                :href="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
+                :href="computedUrl"
                 target="_blank"
                 class="main-button" 
-                :title="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
+                :title="computedUrl"
             >
                 {{current.title}}
             </a>
@@ -120,14 +120,11 @@ const linkValues = computed(() => {
 });
 
 // Логика
-function onDropDownShow(e) {
-    parseTitles();
-    chrome.runtime.sendMessage({do: "getAltWatcherLinks"}, onLinksGet);
-}
 function onLinksGet(res) {
     links.value = res;
     setCurrent();
 }
+
 function setCurrent(link) {
     let pt = titleType.value + pageType.value;
     if (!link) {
@@ -148,9 +145,11 @@ function setCurrent(link) {
     bar.value = false;
     showDropdown.value = false;
 }
+
 function onCurrentClick() {
     chrome.runtime.sendMessage({do: "altWatcherLinkUsed", hash_id: current.value.hash_id});
 }
+
 function parseTitles() {
     let en, ru, jp;
     let h1 = document.querySelector('section > div > header > h1').innerText;
@@ -183,10 +182,7 @@ function parseTitles() {
     titles.value.ru = ru;
     titles.value.jp = jp;
 }
-function openInNewTab(link) {
-    var win = window.open(computeLink(link.link, { title: titles.value[lang.value], id: linkValues.value.id, episode: linkValues.value.episode }), '_blank');
-    win.focus();
-}
+
 function onLangChange(l) {
     lang.value = l;
     setAltWatcherLanguage(l);
@@ -214,7 +210,9 @@ const computedLinks = computed(() => {
     cl.sort(sortByUsedTimes);
     return cl;
 });
+
 const computedUrl = computed(() => current.value ? computeLink(current.value.link, { title: titles.value[lang.value], id: linkValues.value.id, episode: linkValues.value.episode }) : '');
+
 
 onMounted(() => {
     console.log('---', 'AltWatcher mounted');

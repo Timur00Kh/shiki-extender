@@ -30,6 +30,7 @@
 - [ ] Проверить сборку и работоспособность (npm run dev/build)
 - [ ] Вынести вспомогательные функции и логику из App.vue в utils/composables
 - [ ] Перепроверить и доработать функцию computeLink для всех кейсов генерации ссылок ({{title}}, {{id}}, {{episode}})
+- [x] Исправить ошибку TypeError в AltWatcher.vue (добавлена проверка `link && link.used`)
 
 ## Future Tasks
 

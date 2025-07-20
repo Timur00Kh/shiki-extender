@@ -23,7 +23,7 @@
                             <div class="progress" style="height: 20px;">
                                 <div
                                         v-for="link in links"
-                                        v-if="link.used"
+                                        v-if="link && link.used"
                                         class="progress-bar stat"
                                         role="progressbar"
                                         :style="`width: ${link.used / linksTotal * 100}%; background-color: ${getNextColor()}; display: inline-block;`"
@@ -241,284 +241,270 @@
     </div>
 </template>
 
-<script>
-    // import db from '../../../libs/db.js'
-    import axios from 'axios'
-    import {apiDomain} from "../../config";
-    import Search from './components/Search.vue'
-    import MDCheckbox from '../../components/MDCheckbox/MDCheckbox.vue'
-    import {sortByUsedTimes} from "../../../utils/utils";
-    import { computeLink } from '../../../utils/linkPattern';
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
+import axios from 'axios';
+import { apiDomain } from "../../config";
+import Search from './components/Search.vue';
+import MDCheckbox from '../../components/MDCheckbox/MDCheckbox.vue';
+import { sortByUsedTimes } from "../../../utils/utils";
+import { computeLink } from '../../../utils/linkPattern';
 
+// Reactive state
+const loading = ref(true);
+const linksDb = ref(null);
+const current = ref("added");
+const links = ref([]);
+const modal = ref(null);
+const faq = ref('# Загрузка...');
 
+// Color picker utility
+const colorPicker = {
+    iteration: -1,
+    colors: [
+        "#ff0000", "#ffc107", "#28a745", "#007bff", "#0000ff", "#8B008B", "#006400", "#DAA520",
+        "#dc3545", "#343a40", "#800000", "#00008B", "#778899", "#FF1493", "#FF0000"
+    ],
+    getColor() {
+        if (this.iteration - 1 > this.colors.length) {
+            this.iteration = 0;
+        } else {
+            this.iteration++;
+        }
+        return this.colors[this.iteration++];
+    }
+};
 
+// Computed properties
+const tagButtonsDesc = computed(() => {
+    if (!modal.value) return '';
+    
+    const tags = modal.value.tags;
+    const { anime, manga, ranobe } = tags;
+    const count = Object.keys(tags).reduce((sum, e) => (tags[e] & 3) > 0 ? ++sum : sum, 0);
+    let s = '';
+    s = (anime & 2 ? "аниме" : '') +
+        (anime === 3 ? ' и' : '') +
+        (anime & 1 ? ' Rx аниме' : '') +
+        ((((anime & 3) > 0) && ((manga & 3) > 0)) ? ',' : '') +
+        (manga & 2 ? ' манги' : '') +
+        (manga === 3 ? ' и' : '') +
+        (manga & 1 ? ' Rx манги' : '') +
+        ((((manga & 3) > 0) && ((ranobe & 3) > 0)) ? ',' : '') +
+        (ranobe & 2 ? ' ранобе' : '') +
+        (ranobe === 3 ? ' и' : '') +
+        (ranobe & 1 ? ' Rx ранобе' : '');
 
-    export default {
-        name: "AltWatcher",
-        data() {
-            return {
-                loading: true,
-                linksDb: null,
-                current: "added",
-                // current: "search",
-                links: [],
-                modal: null,
-                faq: '# Загрузка...'
-            }
-        },
-        components: {
-            Search,
-            MDCheckbox
-        },
-        mounted() {
-            window.db.open({
-                server: 'linksDb',
-                version: 1,
-                schema: {
-                    link: {
-                        key: {keyPath: 'hash_id', autoIncrement: true, unique: true},
-                    }
-                }
-            }).then(serv => {
-                this.linksDb = serv;
-                this.updateLinks()
+    return s;
+});
+
+const linksTotal = computed(() => {
+    return links.value.reduce((sum, l) => sum + (l.used ? l.used : 0), 0);
+});
+
+const linksUsed = computed(() => {
+    return links.value.filter(l => l.used);
+});
+
+// Methods
+const getNextColor = () => {
+    return colorPicker.getColor();
+};
+
+const resetLinksUses = () => {
+    if (confirm('Вы уверены?')) {
+        linksDb.value.link.query()
+            .all()
+            .execute()
+            .then(results => {
+                results.map(e => ({
+                    ...e,
+                    used: 0
+                })).forEach(e => linksDb.value.link.put(e));
+                updateLinks();
             });
-            axios.get(`${apiDomain}/altWatcher/faq`)
-                .then(res => this.faq = res.data)
-                .catch(err => this.faq = err);
-            console.log('---/altWatcher/faq', () => axios.get(`${apiDomain}/altWatcher/faq`)
-                .then(res => this.faq = res.data)
-                .catch(err => this.faq = err))
-        },
-        watch: {
-            modal(e) {
-                if (e) document.querySelector('body').classList.add("modal-open");
-                else document.querySelector('body').classList.remove("modal-open");
+    }
+};
+
+const updateLinks = () => {
+    linksDb.value.link.query()
+        .all()
+        .execute()
+        .then(results => {
+            if (!results || !Array.isArray(results)) {
+                alert('Что-то пошло не так. F12, скрин консоли в групппу');
+                return;
             }
-        },
-        methods: {
-            async saveLink(l) {
-                let linksDb = this.linksDb;
-                l = JSON.parse(JSON.stringify(l));
-
-                /*Приводим данные в порядок, публикуем*/
-                if (l.action === 'addNewLink') delete l.action;
-
-
-                if ('publish' in l) {
-                    let publish = l.publish;
-
-                    delete l.publish;
-
-                    if (publish) {
-                        try {
-                            let {data: {id}} = await axios.post(`${apiDomain}/altWatcher/link`, {
-                                title: l.title,
-                                link: l.link,
-                                description: l.description,
-                                manga: l.tags.manga,
-                                anime: l.tags.anime,
-                                ranobe: l.tags.ranobe
-                            });
-                            l.id = id;
-                        } catch (e) {
-                            console.error(e.response);
-                            alert(e.response && e.response.data && e.response.data.error || 'Что-то пошло не так');
-                            return;
-                        }
+            results = results.map(e => {
+                if (e.favicon) {
+                    return e;
+                } else {
+                    try {
+                        let origin = (new URL(e.link)).origin;
+                        let favicon = origin + '/favicon.ico';
+                        return {
+                            ...e,
+                            favicon: favicon
+                        };
+                    } catch (error) {
+                        return e;
                     }
                 }
-                /*Добавляем в локал БД*/
-                linksDb.link.put(l);
+            });
+            results.sort(sortByUsedTimes);
+            setTimeout(() => {
+                links.value = results;
+                loading.value = false;
+            }, 300);
+        });
+};
 
-                /*Синхронизируем данные с представлением */
-                if (l.hash_id && this.links.find(e => e.hash_id === l.hash_id)) {
-                    this.links[
-                        this.links.findIndex(e => e.hash_id === l.hash_id)
-                        ] = l;
-                } else {
-                    this.links.push(l);
-                }
-                this.modal = null;
-            },
-            showModal(l) {
-                this.modal = JSON.parse(JSON.stringify({
-                    ...l,
-                    publish: l.publish || false
-                }));
+const saveLink = async (l) => {
+    let linksDbInstance = linksDb.value;
+    l = JSON.parse(JSON.stringify(l));
 
-                /*Гениальный костыль за 2 сек*/
-                setTimeout(() => {
-                    $('#highlight').highlightWithinTextarea({
-                        highlight: [
-                            {
-                                highlight: '{{id}}',
-                                className: 'blue'
-                            },
-                            {
-                                className: 'blue',
-                                highlight: /\{\{title=?(.*?)\}\}/g
-                            },
-                            {
-                                highlight: "{{episode}}",
-                                className: 'blue'
-                            }
-                        ]
-                    });
-                }, 300);
+    /*Приводим данные в порядок, публикуем*/
+    if (l.action === 'addNewLink') delete l.action;
 
-            },
-            addNewLink() {
-                this.showModal({
-                    action: "addNewLink",
-                    title: "",
-                    link: "",
-                    tags: {
-                        manga: 0,
-                        anime: 2,
-                        ranobe: 0,
-                    },
-                    description: '',
-                    publish: true
+    if ('publish' in l) {
+        let publish = l.publish;
+
+        delete l.publish;
+
+        if (publish) {
+            try {
+                let { data: { id } } = await axios.post(`${apiDomain}/altWatcher/link`, {
+                    title: l.title,
+                    link: l.link,
+                    description: l.description,
+                    manga: l.tags.manga,
+                    anime: l.tags.anime,
+                    ranobe: l.tags.ranobe
                 });
-            },
-            deleteLink(l) {
-                if (l.hash_id && this.links.find(e => e.hash_id === l.hash_id)) {
-                    this.linksDb.link.delete(l.hash_id);
-                    let i = this.links.findIndex(e => e.hash_id === l.hash_id);
-                    this.links.splice(i, 1)
-                }
-                this.modal = null;
-            },
-            insertTextAtCursor(text, offset) {
-                let el = document.getElementById("highlight");
-                let val = el.value, endIndex, range, doc = el.ownerDocument;
-                if (typeof el.selectionStart === "number"
-                    && typeof el.selectionEnd === "number") {
-                    endIndex = el.selectionEnd;
-                    this.modal.link = val.slice(0, endIndex) + text + val.slice(endIndex);
-                    el.focus();
-                    el.selectionStart = el.selectionEnd = endIndex + text.length + (offset ? offset : 0);
-                } else if (doc.selection !== "undefined" && doc.selection.createRange) {
-                    el.focus();
-                    range = doc.selection.createRange();
-                    range.collapse(false);
-                    range.text = text;
-                    range.select();
-                }
-
-                setTimeout(() => {
-                    $(el).highlightWithinTextarea('update');
-                }, 10);
-            },
-            getNextColor() {
-                return colorPicker.getColor();
-            },
-            resetLinksUses() {
-                if (confirm('Вы уверены?')) {
-                    this.linksDb.link.query()
-                        .all()
-                        .execute()
-                        .then(results => {
-                            results.map(e => ({
-                                ...e,
-                                used: 0
-                            })).forEach(e => this.linksDb.link.put(e));
-                            this.updateLinks();
-                        })
-                }
-            },
-            updateLinks() {
-                let self = this;
-                this.linksDb.link.query()
-                    .all()
-                    .execute()
-                    .then(results => {
-                        if (!results || !Array.isArray(results)) {
-                            alert('Что-то пошло не так. F12, скрин консоли в групппу')
-                            return;
-                        }
-                        results = results.map(e => {
-                            if (e.favicon) {
-                                return e;
-                            } else {
-                                try {
-                                    let origin = (new URL(e.link)).origin;
-                                    let favicon = origin + '/favicon.ico';
-                                    return {
-                                        ...e,
-                                        favicon: favicon
-                                    }
-                                } catch (error) {
-                                    return e
-                                }
-                            }
-                        });
-                        results.sort(sortByUsedTimes);
-                        setTimeout(() => {
-                            self.links = results;
-                            self.loading = false;
-                        }, 300);
-                    })
-            }
-        },
-        computed: {
-            tagButtonsDesc() {
-                const tags = this.modal.tags;
-                const {anime, manga, ranobe} = tags;
-                const count = Object.keys(tags).reduce((sum, e) => (tags[e] & 3) > 0 ? ++sum : sum, 0);
-                let s = '';
-                s = (anime & 2 ? "аниме" : '') +
-                    (anime === 3 ? ' и' : '') +
-                    (anime & 1 ? ' Rx аниме' : '') +
-                    ((((anime & 3) > 0) && ((manga & 3) > 0)) ? ',' : '') +
-                    (manga & 2 ? ' манги' : '') +
-                    (manga === 3 ? ' и' : '') +
-                    (manga & 1 ? ' Rx манги' : '') +
-                    ((((manga & 3) > 0) && ((ranobe & 3) > 0)) ? ',' : '') +
-                    (ranobe & 2 ? ' ранобе' : '') +
-                    (ranobe === 3 ? ' и' : '') +
-                    (ranobe & 1 ? ' Rx ранобе' : '');
-
-                return s;
-
-            },
-            linksTotal() {
-                return this.links.reduce((sum, l) => sum + (l.used ? l.used : 0), 0)
-            },
-            linksUsed() {
-                return this.links.filter(l => l.used)
+                l.id = id;
+            } catch (e) {
+                console.error(e.response);
+                alert(e.response && e.response.data && e.response.data.error || 'Что-то пошло не так');
+                return;
             }
         }
     }
+    /*Добавляем в локал БД*/
+    linksDbInstance.link.put(l);
 
-    let colorPicker = {};
-    colorPicker.getColor = function () {
-        if (this.iteration - 1 > this.colors.length) {
-            this.iteration = 0
-        } else {
-            this.iteration++
+    /*Синхронизируем данные с представлением */
+    if (l.hash_id && links.value.find(e => e.hash_id === l.hash_id)) {
+        links.value[
+            links.value.findIndex(e => e.hash_id === l.hash_id)
+        ] = l;
+    } else {
+        links.value.push(l);
+    }
+    modal.value = null;
+};
+
+const showModal = (l) => {
+    modal.value = JSON.parse(JSON.stringify({
+        ...l,
+        publish: l.publish || false
+    }));
+
+    /*Гениальный костыль за 2 сек*/
+    setTimeout(() => {
+        $('#highlight').highlightWithinTextarea({
+            highlight: [
+                {
+                    highlight: '{{id}}',
+                    className: 'blue'
+                },
+                {
+                    className: 'blue',
+                    highlight: /\{\{title=?(.*?)\}\}/g
+                },
+                {
+                    highlight: "{{episode}}",
+                    className: 'blue'
+                }
+            ]
+        });
+    }, 300);
+};
+
+const addNewLink = () => {
+    showModal({
+        action: "addNewLink",
+        title: "",
+        link: "",
+        tags: {
+            manga: 0,
+            anime: 2,
+            ranobe: 0,
+        },
+        description: '',
+        publish: true
+    });
+};
+
+const deleteLink = (l) => {
+    if (l.hash_id && links.value.find(e => e.hash_id === l.hash_id)) {
+        linksDb.value.link.delete(l.hash_id);
+        let i = links.value.findIndex(e => e.hash_id === l.hash_id);
+        links.value.splice(i, 1);
+    }
+    modal.value = null;
+};
+
+const insertTextAtCursor = (text, offset) => {
+    let el = document.getElementById("highlight");
+    let val = el.value, endIndex, range, doc = el.ownerDocument;
+    if (typeof el.selectionStart === "number"
+        && typeof el.selectionEnd === "number") {
+        endIndex = el.selectionEnd;
+        modal.value.link = val.slice(0, endIndex) + text + val.slice(endIndex);
+        el.focus();
+        el.selectionStart = el.selectionEnd = endIndex + text.length + (offset ? offset : 0);
+    } else if (doc.selection !== "undefined" && doc.selection.createRange) {
+        el.focus();
+        range = doc.selection.createRange();
+        range.collapse(false);
+        range.text = text;
+        range.select();
+    }
+
+    setTimeout(() => {
+        $(el).highlightWithinTextarea('update');
+    }, 10);
+};
+
+// Lifecycle
+onMounted(() => {
+    window.db.open({
+        server: 'linksDb',
+        version: 1,
+        schema: {
+            link: {
+                key: { keyPath: 'hash_id', autoIncrement: true, unique: true },
+            }
         }
-        return this.colors[this.iteration++]
-    };
-    colorPicker.iteration = -1;
-    colorPicker.colors = [
-        "#ff0000",
-        "#ffc107",
-        "#28a745",
-        "#007bff",
-        "#0000ff",
-        "#8B008B",
-        "#006400",
-        "#DAA520",
-        "#dc3545",
-        "#343a40",
-        "#800000",
-        "#00008B",
-        "#778899",
-        "#FF1493",
-        "#FF0000"
-    ];
+    }).then(serv => {
+        linksDb.value = serv;
+        updateLinks();
+    });
+    
+    axios.get(`${apiDomain}/altWatcher/faq`)
+        .then(res => faq.value = res.data)
+        .catch(err => faq.value = err);
+    
+    console.log('---/altWatcher/faq', () => axios.get(`${apiDomain}/altWatcher/faq`)
+        .then(res => faq.value = res.data)
+        .catch(err => faq.value = err));
+});
+
+// Watchers
+watch(modal, (e) => {
+    if (e) document.querySelector('body').classList.add("modal-open");
+    else document.querySelector('body').classList.remove("modal-open");
+});
 </script>
 
 <style scoped>
