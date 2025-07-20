@@ -1,23 +1,24 @@
 <template>
-    <div id="altWatcherContainer" data-bs-theme="light" :class="classes.altWatcher__container" v-if="computedLinks.length > 0">
-        <div class="btn-group w-100">
+    <div id="altWatcherContainer" v-if="computedLinks.length > 0">
+        <div class="split-button-group">
             <button 
                 v-if="current"
                 @click="onCurrentClick"
-                class="btn btn-secondary btn-lg" 
+                class="main-button" 
                 type="button"
-                style="width: 100%"
                 :title="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
             >
                 {{current.title}}
             </button>
             <button 
                 type="button" 
-                class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split" 
+                class="dropdown-toggle" 
                 @click="showDropdown = !showDropdown"
                 aria-expanded="false"
-            />
-            <ul v-if="showDropdown" class="dropdown-menu dropdown-menu-end show">
+            >
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul v-if="showDropdown" class="dropdown-menu">
                 <li v-for="link in computedLinks" :key="'altWatcher_link_' + link.hash_id">
                     <a
                         @click.prevent="setCurrent(link)"
@@ -74,7 +75,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { sortByUsedTimes } from '../../../utils/utils';
 import { computeLink } from '../../../utils/linkPattern';
-import classes from "./AltWatcher.module.scss";
 
 
 function getPrefServiceId(pageType) {
@@ -245,6 +245,105 @@ function handleClickOutside(event) {
 
 <style lang="scss">
     #altWatcherContainer {
+        .split-button-group {
+            display: flex;
+            width: 100%;
+            position: relative;
+        }
+
+        .main-button {
+            flex: 1;
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            padding: 12px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+
+        .main-button:hover {
+            background: #357ab8;
+        }
+
+        .dropdown-toggle {
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+            min-width: 40px;
+        }
+
+        .dropdown-toggle:hover {
+            background: #357ab8;
+        }
+
+        .dropdown-toggle::after {
+            content: "▼";
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+            padding: 8px 0;
+            z-index: 1000;
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-item.active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .dropdown-divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
 
         .favicon {
             width: 16px;
