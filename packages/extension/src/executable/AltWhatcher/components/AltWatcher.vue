@@ -1,15 +1,16 @@
 <template>
-    <div id="altWatcherContainer" v-if="computedLinks.length > 0">
+    <div :id="ALT_WATCHER_CONTAINER_ID" v-if="computedLinks.length > 0">
         <div class="split-button-group">
-            <button 
+            <a 
                 v-if="current"
                 @click="onCurrentClick"
+                :href="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
+                target="_blank"
                 class="main-button" 
-                type="button"
                 :title="computeLink(current.link, { title: titles[lang], id: linkValues.id, episode: linkValues.episode })"
             >
                 {{current.title}}
-            </button>
+            </a>
             <button 
                 type="button" 
                 class="dropdown-toggle" 
@@ -75,6 +76,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { sortByUsedTimes } from '../../../utils/utils';
 import { computeLink } from '../../../utils/linkPattern';
+
+const ALT_WATCHER_CONTAINER_ID = 'altWatcherContainer';
 
 
 function getPrefServiceId(pageType) {
@@ -236,7 +239,7 @@ onUnmounted(() => {
 });
 
 function handleClickOutside(event) {
-    const container = document.getElementById('altWatcherContainer');
+    const container = document.getElementById(ALT_WATCHER_CONTAINER_ID);
     if (container && !container.contains(event.target) && showDropdown.value) {
         showDropdown.value = false;
     }
@@ -245,15 +248,18 @@ function handleClickOutside(event) {
 
 <style lang="scss">
     #altWatcherContainer {
+        margin: 24px 0;
+
         .split-button-group {
             display: flex;
             width: 100%;
             position: relative;
+            text-align: center;
         }
 
         .main-button {
             flex: 1;
-            background: #4a90e2;
+            background: #6c757d;
             color: #fff;
             border: none;
             border-radius: 4px 0 0 4px;
@@ -262,14 +268,19 @@ function handleClickOutside(event) {
             cursor: pointer;
             transition: background 0.2s;
             font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .main-button:hover {
-            background: #357ab8;
+            background: #5c636a;
         }
 
         .dropdown-toggle {
-            background: #4a90e2;
+            background: #6c757d;
             color: #fff;
             border: none;
             border-radius: 0 4px 4px 0;
@@ -281,13 +292,12 @@ function handleClickOutside(event) {
         }
 
         .dropdown-toggle:hover {
-            background: #357ab8;
+            background: #5c636a;
         }
 
         .dropdown-toggle::after {
             content: "▼";
             font-size: 10px;
-            margin-left: 4px;
         }
 
         .dropdown-menu {

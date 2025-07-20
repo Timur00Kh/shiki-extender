@@ -1,6 +1,9 @@
 import { createApp } from 'vue'
 import App from './components/AltWatcher.vue'
 
+const ALT_WATCHER_CONTAINER_ID = 'altWatcherContainer';
+const ALT_WATCHER_ID = 'altWatcher';
+
 console.log("---", 'altWatcher initialized');
 
 let app = null;
@@ -28,12 +31,12 @@ async function start() {
     }
 
     // Удаление существующего контейнера
-    const existingContainer = document.getElementById('altWatcherContainer');
+    const existingContainer = document.getElementById(ALT_WATCHER_CONTAINER_ID);
     if (existingContainer) {
         existingContainer.remove();
     }
 
-    const existingAltWatcher = document.getElementById('altWatcher');
+    const existingAltWatcher = document.getElementById(ALT_WATCHER_ID);
     if (existingAltWatcher) {
         existingAltWatcher.remove();
     }
@@ -41,12 +44,12 @@ async function start() {
     const infoRight = document.querySelector('.c-info-right');
     if (infoRight) {
         const altWatcherDiv = document.createElement('div');
-        altWatcherDiv.id = 'altWatcher';
+        altWatcherDiv.id = ALT_WATCHER_ID;
         infoRight.appendChild(altWatcherDiv);
 
         // Создание нового приложения
         app = createApp(App);
-        app.mount('#altWatcher');
+        app.mount(`#${ALT_WATCHER_ID}`);
     }
 }
 
@@ -61,4 +64,6 @@ if (import.meta.hot) {
 document.addEventListener('DOMContentLoaded', start);
 document.addEventListener('page:load', start);
 document.addEventListener('turbolinks:load', start);
-setTimeout(start, 2000);
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    start();
+}
