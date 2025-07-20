@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import App from './components/App.vue'
+import App from './components/AltWatcher.vue'
 
 console.log("---", 'altWatcher initialized');
 
@@ -52,7 +52,7 @@ async function start() {
 
 // Hot Module Replacement поддержка
 if (import.meta.hot) {
-    import.meta.hot.accept('./components/App.vue', () => {
+    import.meta.hot.accept('./components/AltWatcher.vue', () => {
         console.log('HMR: App.vue updated, restarting...');
         start();
     });

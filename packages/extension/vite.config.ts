@@ -43,4 +43,11 @@ export default defineConfig({
         outDir: path.resolve(__dirname, './dist'),
         emptyOutDir: true,
     },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                quietDeps: true,
+            },
+        },
+    },
 });

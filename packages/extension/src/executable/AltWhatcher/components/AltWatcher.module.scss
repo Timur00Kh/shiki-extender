@@ -1,0 +1,26 @@
+$prefix: "altW-";
+
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/root";
+
+.altWatcher__container {
+  :global {
+    @import "bootstrap/scss/buttons";
+    @import "bootstrap/scss/button-group";
+    @import "bootstrap/scss/dropdown";
+    @import "bootstrap/scss/utilities";
+
+    .w-100 {
+      width: 100%;
+    }
+
+    .favicon {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+  }
+}
