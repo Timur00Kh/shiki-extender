@@ -10,7 +10,7 @@
             <ol class="breadcrumb">
               <li
                 v-for="r in routes"
-                v-if="r.show"
+                v-show="r.show"
                 class="breadcrumb-item active"
                 aria-current="page"
               >
@@ -18,40 +18,24 @@
               </li>
             </ol>
           </nav>
-          <router-view class="mt-1"></router-view>
+          <router-view class="mt-1" />
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "App.vue",
-  data() {
-    return {
-      route: this.$route,
-    };
-  },
-  computed: {
-    routes() {
-      return [
-        {
-          title: "Главная",
-          active: false,
-          show: ~this.$route.path.indexOf("/"),
-          href: "/",
-        },
-        {
-          title: "AltWatcher",
-          active: true,
-          show: ~this.$route.path.indexOf("/altWatcher"),
-          href: "/altWatcher",
-        },
-      ];
-    },
-  },
-};
-</script>
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 
-<style></style>
+const route = useRoute();
+const routes = computed(() => [
+  { title: "Главная", show: true, href: "/" },
+  {
+    title: "AltWatcher",
+    show: route.path.indexOf("/altWatcher") !== -1,
+    href: "/altWatcher",
+  },
+]);
+</script>
