@@ -1,0 +1,23 @@
+{
+  "name": "shiki-extender",
+  "version": "1.0.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt dev",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "idb": "^8.0.0",
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "typescript": "^5.3.0",
+    "vue-tsc": "^2.0.0",
+    "wxt": "^0.20.0"
+  }
+}
