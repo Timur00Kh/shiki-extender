@@ -2,10 +2,6 @@
 .DS_Store
 node_modules
 
-# Chrome extension (legacy Webpack)
-Chrome_extension/dist
-Chrome_extension/dist/*
-
 # WXT extension build
 .output
 output
