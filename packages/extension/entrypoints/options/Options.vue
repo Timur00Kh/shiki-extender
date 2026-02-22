@@ -45,7 +45,10 @@ const route = useRoute();
 const altWatcher = ref(true);
 const isPopup = ref(!!route.query.popup);
 
-const optionsUrl = browser.runtime.getURL("options.html") + "#/altWatcher";
+const optionsUrl =
+  (browser.runtime as unknown as { getURL(path: string): string }).getURL(
+    "options.html"
+  ) + "#/altWatcher";
 
 function loadAltWatcher() {
   browser.storage.local.get(STORAGE_KEY).then((result) => {

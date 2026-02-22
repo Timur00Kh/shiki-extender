@@ -145,10 +145,11 @@
                       >
                       <span
                         v-if="
-                          Object.keys(link.tags).reduce(
-                            (sum, e) => (link.tags[e] & (1 > 0) ? true : sum),
-                            false
-                          )
+                          [
+                            link.tags.manga,
+                            link.tags.anime,
+                            link.tags.ranobe,
+                          ].some((v) => (v & 1) !== 0)
                         "
                         class="badge badge-danger"
                       >
@@ -243,11 +244,11 @@ const params = ref({
   ranobe: 0,
   approved: true,
 });
-const query = ref<Array<Record<string, unknown> & { more?: boolean }>>([]);
+const query = ref<Array<SearchResultItem & { more?: boolean }>>([]);
 const loading = ref(false);
 
 // TODO: integrate with backend (Convex/Supabase) — fetch link list from API instead of local dump
-const dump = linksDump as Array<{
+type SearchResultItem = {
   id: number;
   title: string;
   link: string;
@@ -257,7 +258,8 @@ const dump = linksDump as Array<{
   ranobe: number;
   approved: boolean;
   number_of_downloads?: number;
-}>;
+};
+const dump = linksDump as SearchResultItem[];
 
 function onSaveButtonClick(l: {
   id?: number;
@@ -301,9 +303,21 @@ async function startSearch() {
   }, 300);
 }
 
-const computedQuery = computed(() =>
+type ComputedLink = {
+  id: number;
+  title: string;
+  link: string;
+  tags: { manga: number; anime: number; ranobe: number };
+  approved: boolean;
+  number_of_downloads?: number;
+  description?: string;
+  alreadyAdded: boolean;
+  more?: boolean;
+  favicon?: string;
+};
+const computedQuery = computed<ComputedLink[]>(() =>
   query.value.map((e) => {
-    const link = {
+    const link: ComputedLink = {
       id: e.id,
       title: e.title,
       link: e.link,
@@ -311,9 +325,9 @@ const computedQuery = computed(() =>
       approved: e.approved,
       number_of_downloads: e.number_of_downloads,
       description: e.description,
-      alreadyAdded: !!props.links.find((el) => el.id == e.id),
+      alreadyAdded: !!props.links.find((el) => el.id === e.id),
       more: e.more,
-      favicon: (e as { favicon?: string }).favicon,
+      favicon: (e as SearchResultItem & { favicon?: string }).favicon,
     };
     if (!link.favicon) {
       try {

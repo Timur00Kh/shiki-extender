@@ -12,8 +12,8 @@
     "skipLibCheck": true,
     "noEmit": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["./*"] },
-    "types": ["wxt/client-types", "wxt/browser-types"]
+    "paths": { "@/*": ["./*"] }
   },
-  "include": ["./**/*.ts", "./**/*.vue"]
+  "include": ["./**/*.ts", "./**/*.vue"],
+  "exclude": ["node_modules", ".output"]
 }
