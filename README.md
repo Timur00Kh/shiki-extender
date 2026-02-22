@@ -1,5 +1,7 @@
 # Shiki Extender
 
+[![Chrome Web Store users](https://img.shields.io/chrome-web-store/users/omonjfjfonodikianjjfdcdodjndnffe)](https://chrome.google.com/webstore/detail/omonjfjfonodikianjjfdcdodjndnffe)
+
 Расширение для браузера Chrome, которое добавляет быстрые ссылки на альтернативные сайты (аниме, манга, ранобе) на страницах Shikimori.
 
 ## Структура репозитория
