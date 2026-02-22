@@ -26,6 +26,11 @@ jobs:
           cd packages/extension
           npm ci
 
+      - name: Prepare WXT (generate .wxt types)
+        run: |
+          cd packages/extension
+          npx wxt prepare
+
       - name: Typecheck
         run: |
           cd packages/extension
