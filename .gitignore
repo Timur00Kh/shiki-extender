@@ -6,3 +6,5 @@ node_modules
 .output
 output
 *.zip
+.env
+.env.*

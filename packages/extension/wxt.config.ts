@@ -1,6 +1,7 @@
 import path from "node:path";
 import { defineConfig } from "wxt";
 import vue from "@vitejs/plugin-vue";
+import pkg from "./package.json" with { type: "json" };
 
 export default defineConfig({
   srcDir: ".",
@@ -16,7 +17,7 @@ export default defineConfig({
     name: "Shiki extender",
     description:
       "AltWatcher: quick links to alternative anime/manga/ranobe sites on Shikimori.",
-    version: "1.0.2",
+    version: pkg.version,
     permissions: ["storage", "unlimitedStorage"],
     action: {
       default_title: "Shiki extender",

@@ -7,39 +7,39 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: Chrome_extension/src/package-lock.json
-        
-    - name: Install dependencies
-      run: |
-        cd Chrome_extension/src
-        npm ci
-        
-    - name: Build extension
-      run: |
-        cd Chrome_extension/src
-        npm run build
-        
-    - name: Create extension package
-      run: |
-        cd Chrome_extension/dist
-        zip -r ../shiki-extension.zip . -x "*.map"
-        
-    - name: Publish to Chrome Web Store
-      uses: trmcnvn/chrome-addon@v2
-      with:
-        extension: ${{ secrets.EXTENSION_ID }}
-        zip: Chrome_extension/dist/shiki-extension.zip
-        client-id: ${{ secrets.CLIENT_ID }}
-        client-secret: ${{ secrets.CLIENT_SECRET }}
-        refresh-token: ${{ secrets.REFRESH_TOKEN }}
-        target: default
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: packages/extension/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd packages/extension
+          npm ci
+
+      - name: Build extension
+        run: |
+          cd packages/extension
+          npm run build
+
+      - name: Create extension zip
+        run: |
+          cd packages/extension
+          npm run zip
+
+      - name: Publish to Chrome Web Store
+        run: |
+          cd packages/extension
+          npx wxt submit --chrome-zip .output/*-chrome-mv3.zip
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
