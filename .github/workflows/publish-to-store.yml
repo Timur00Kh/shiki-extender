@@ -37,7 +37,7 @@ jobs:
       - name: Publish to Chrome Web Store
         run: |
           cd packages/extension
-          npx wxt submit --chrome-zip .output/*-chrome-mv3.zip
+          npx wxt submit --chrome-zip .output/*-chrome.zip
         env:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
