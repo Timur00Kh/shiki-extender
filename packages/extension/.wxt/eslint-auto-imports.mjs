@@ -48,12 +48,14 @@ const globals = {
   "fakeBrowser": true,
   "getAllLinks": true,
   "getLink": true,
+  "getStableId": true,
   "hasApi": true,
   "injectScript": true,
   "putLink": true,
   "putLinks": true,
   "sortByUsedTimes": true,
   "storage": true,
+  "toStableId": true,
   "useAppConfig": true
 }
 

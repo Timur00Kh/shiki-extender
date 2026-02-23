@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { and, desc, eq, like, sql } from "drizzle-orm";
 import path from "path";
+import { nanoid } from "nanoid";
 import { db, altwatcherLink } from "../db/index.js";
 
 const router = Router();
@@ -68,20 +69,22 @@ router.post("/link", (req: Request, res: Response) => {
       return;
     }
 
+    const linkStr = String(link);
     const result = db
       .insert(altwatcherLink)
       .values({
         title: String(title),
-        link: String(link),
+        link: linkStr,
         description: description != null ? String(description) : null,
         manga: Number(manga) || 0,
         anime: Number(anime) || 0,
         ranobe: Number(ranobe) || 0,
+        stable_id: nanoid(),
       })
-      .returning({ id: altwatcherLink.id })
+      .returning({ id: altwatcherLink.id, stable_id: altwatcherLink.stable_id })
       .get();
 
-    res.json({ id: result.id });
+    res.json({ id: result.id, stable_id: result.stable_id });
   } catch (e) {
     console.error(e);
     res.sendStatus(500);

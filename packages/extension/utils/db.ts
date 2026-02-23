@@ -7,6 +7,7 @@ const STORE_NAME = "link";
 export interface LinkRecord {
   hash_id?: number;
   id?: number;
+  stable_id?: string;
   title: string;
   link: string;
   tags: { manga: number; anime: number; ranobe: number };

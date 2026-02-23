@@ -27,13 +27,15 @@
         <div v-show="dropdownOpen" class="altwatcher-dropdown-menu">
           <a
             v-for="link in computedLinks"
-            :key="link.hash_id ?? link.id ?? link.link"
+            :key="link.stable_id ?? link.hash_id ?? link.id ?? link.link"
             :href="computeLink(link.link)"
             target="_blank"
             rel="noopener"
             class="altwatcher-dropdown-item"
             :class="{
               active:
+                (link.stable_id != null &&
+                  link.stable_id === current?.stable_id) ||
                 (link.hash_id != null && link.hash_id === current?.hash_id) ||
                 (link.id != null && link.id === current?.id),
             }"
@@ -78,13 +80,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { browser } from "wxt/browser";
 import FaviconImg from "@/components/FaviconImg.vue";
+import { getStableId } from "@/utils/stableId";
 
 interface LinkItem {
   hash_id?: number;
   id?: number;
+  stable_id?: string;
   title: string;
   link: string;
   tags: { manga: number; anime: number; ranobe: number };
@@ -106,16 +110,24 @@ const titles = ref<{ ru: string | null; en: string | null; jp: string | null }>(
   }
 );
 
-function getPrefServiceId(pageTypeKey: string): number | null {
+function getPrefServiceStableId(pageTypeKey: string): string | null {
   const m = document.cookie.match(
     new RegExp("(?:^|; )altWatcherPrefServiceFor" + pageTypeKey + "=([^;]*)")
   );
-  return m ? Number(m[1]) : null;
+  if (!m) return null;
+  try {
+    const v = decodeURIComponent(m[1].trim());
+    return v.length > 0 ? v : null;
+  } catch {
+    return m[1].trim() || null;
+  }
 }
 
-function setPrefService(pageTypeKey: string, hashId: number) {
+function setPrefService(pageTypeKey: string, value: string) {
   const d = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  document.cookie = `altWatcherPrefServiceFor${pageTypeKey}=${hashId}; path=/; expires=${d.toUTCString()}`;
+  document.cookie = `altWatcherPrefServiceFor${pageTypeKey}=${encodeURIComponent(
+    value
+  )}; path=/; expires=${d.toUTCString()}`;
 }
 
 function getAltWatcherLanguage(): string {
@@ -338,35 +350,73 @@ function computeLink(link: string): string {
   return link;
 }
 
-function onLinksGet(res: LinkItem[]) {
-  links.value = res || [];
+async function onLinksGet(res: LinkItem[]) {
+  const list = res || [];
+  links.value = await Promise.all(
+    list.map(async (l) => ({
+      ...l,
+      stable_id: l.stable_id ?? (await getStableId(l)),
+    }))
+  );
   setCurrent(null);
 }
+
+// Восстановить выбор при появлении links или смене pageType/titleType (избегаем гонки:
+// ответ мог прийти до установки titleType/pageType, тогда ключ cookie был неверный).
+watch(
+  () => [links.value.length, titleType.value, pageType.value] as const,
+  () => {
+    if (links.value.length > 0 && titleType.value && pageType.value) {
+      setCurrent(null);
+    }
+  },
+  { immediate: true }
+);
 
 function setCurrent(link: LinkItem | null) {
   const pageTypeKey = titleType.value + pageType.value;
 
   if (!link) {
-    const storedId = getPrefServiceId(pageTypeKey);
-    const found = links.value.find(
-      (e) => e.hash_id === storedId || e.id === storedId
-    );
-    if (found) {
-      current.value = found;
+    const stored = getPrefServiceStableId(pageTypeKey);
+    let found: LinkItem | undefined;
+    const legacyNum =
+      stored != null &&
+      Number.isInteger(Number(stored)) &&
+      String(Number(stored)) === stored
+        ? Number(stored)
+        : null;
+    if (legacyNum != null) {
+      found = links.value.find(
+        (e) => e.hash_id === legacyNum || e.id === legacyNum
+      );
+    } else if (stored) {
+      found = links.value.find((e) => e.stable_id === stored);
+    }
+    const allowed = computedLinks.value;
+    const foundInAllowed =
+      found &&
+      allowed.find(
+        (e) =>
+          e.stable_id === found.stable_id ||
+          (e.hash_id === found.hash_id && e.id === found.id)
+      );
+    if (foundInAllowed) {
+      current.value = foundInAllowed;
       return;
     }
-    if (computedLinks.value.length) {
-      current.value = computedLinks.value[0];
+    if (allowed.length) {
+      current.value = allowed[0];
     }
     return;
   }
   current.value = link;
-  const idToStore = link.hash_id ?? link.id;
-  if (idToStore != null) setPrefService(pageTypeKey, idToStore);
+  getStableId(link).then((sid) => setPrefService(pageTypeKey, sid));
 }
 
 function onCurrentClick() {
   if (current.value) {
+    const pageTypeKey = titleType.value + pageType.value;
+    getStableId(current.value).then((sid) => setPrefService(pageTypeKey, sid));
     browser.runtime.sendMessage({
       do: "altWatcherLinkUsed",
       hash_id: current.value.hash_id,

@@ -383,6 +383,8 @@ import {
   deleteLink as deleteLinkFromDb,
   type LinkRecord,
 } from "@/utils/db";
+import { nanoid } from "nanoid";
+import { getStableId } from "@/utils/stableId";
 import { hasApi, apiBaseUrl } from "@/utils/api";
 import { sortByUsedTimes } from "@/utils/sort";
 import FaviconImg from "@/components/FaviconImg.vue";
@@ -487,10 +489,19 @@ async function saveLink(l: ModalLink) {
       if (res.ok) {
         const data = await res.json();
         if (typeof data.id === "number") payload.id = data.id;
+        if (typeof data.stable_id === "string")
+          payload.stable_id = data.stable_id;
       }
     } catch (_) {
       // fallback: save locally without server id
     }
+  }
+  if (!payload.stable_id && payload.link) {
+    // New user-added link (no hash_id yet): nanoid; existing/old link: hash from URL
+    payload.stable_id =
+      payload.hash_id == null
+        ? nanoid()
+        : await getStableId(payload as LinkRecord);
   }
   await putLink(payload as LinkRecord);
   const idx = links.value.findIndex(

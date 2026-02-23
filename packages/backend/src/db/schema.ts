@@ -13,6 +13,7 @@ export const altwatcherLink = sqliteTable("altwatcher_link", {
   is_default: integer("is_default", { mode: "boolean" })
     .default(false)
     .notNull(),
+  stable_id: text("stable_id").unique(),
 });
 
 export type AltWatcherLink = typeof altwatcherLink.$inferSelect;

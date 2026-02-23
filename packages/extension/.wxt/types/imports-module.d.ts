@@ -21,4 +21,5 @@ declare module '#imports' {
   export { getAllLinks, getLink, putLink, putLinks, deleteLink, clearLinks, LinkRecord } from '../utils/db';
   export { DEFAULT_LINKS } from '../utils/defaultLinks';
   export { sortByUsedTimes } from '../utils/sort';
+  export { toStableId, getStableId } from '../utils/stableId';
 }

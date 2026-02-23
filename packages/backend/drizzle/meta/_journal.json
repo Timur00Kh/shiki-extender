@@ -15,6 +15,13 @@
       "when": 1730000000000,
       "tag": "0001_seed_altwatcher_link",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771878952641,
+      "tag": "0002_add_stable_id",
+      "breakpoints": true
     }
   ]
 }

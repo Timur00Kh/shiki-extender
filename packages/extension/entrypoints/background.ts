@@ -16,11 +16,13 @@ type ApiLink = {
   approved: boolean;
   number_of_downloads: number;
   is_default?: boolean;
+  stable_id?: string | null;
 };
 
 function apiRowToLink(row: ApiLink): LinkRecord {
   return {
     id: row.id,
+    stable_id: row.stable_id ?? undefined,
     title: row.title,
     link: row.link,
     description: row.description ?? undefined,

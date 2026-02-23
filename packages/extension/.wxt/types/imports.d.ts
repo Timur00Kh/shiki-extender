@@ -20,12 +20,14 @@ declare global {
   const fakeBrowser: typeof import('wxt/testing').fakeBrowser
   const getAllLinks: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').getAllLinks
   const getLink: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').getLink
+  const getStableId: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/stableId').getStableId
   const hasApi: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/api').hasApi
   const injectScript: typeof import('wxt/utils/inject-script').injectScript
   const putLink: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').putLink
   const putLinks: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').putLinks
   const sortByUsedTimes: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/sort').sortByUsedTimes
   const storage: typeof import('wxt/utils/storage').storage
+  const toStableId: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/stableId').toStableId
   const useAppConfig: typeof import('wxt/utils/app-config').useAppConfig
 }
 // for type re-export
