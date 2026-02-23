@@ -8,3 +8,6 @@ output
 *.zip
 .env
 .env.*
+packages/backend/data
+packages/backend/dist
+packages/backend/.env.local

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wxt dev",
     "build": "wxt build",
+    "build:local": "wxt build --mode development",
     "zip": "wxt zip",
     "typecheck": "vue-tsc --noEmit"
   },

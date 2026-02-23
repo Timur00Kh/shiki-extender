@@ -5,6 +5,7 @@ declare global {
   const DEFAULT_LINKS: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/defaultLinks').DEFAULT_LINKS
   const InvalidMatchPattern: typeof import('wxt/utils/match-patterns').InvalidMatchPattern
   const MatchPattern: typeof import('wxt/utils/match-patterns').MatchPattern
+  const apiBaseUrl: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/api').apiBaseUrl
   const browser: typeof import('wxt/browser').browser
   const clearLinks: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').clearLinks
   const createIframeUi: typeof import('wxt/utils/content-script-ui/iframe').createIframeUi
@@ -19,6 +20,7 @@ declare global {
   const fakeBrowser: typeof import('wxt/testing').fakeBrowser
   const getAllLinks: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').getAllLinks
   const getLink: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').getLink
+  const hasApi: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/api').hasApi
   const injectScript: typeof import('wxt/utils/inject-script').injectScript
   const putLink: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').putLink
   const putLinks: typeof import('/Users/timur/Documents/GitHub/shiki-extender/packages/extension/utils/db').putLinks

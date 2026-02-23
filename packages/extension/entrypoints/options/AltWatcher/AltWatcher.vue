@@ -383,6 +383,7 @@ import {
   deleteLink as deleteLinkFromDb,
   type LinkRecord,
 } from "@/utils/db";
+import { hasApi, apiBaseUrl } from "@/utils/api";
 import { sortByUsedTimes } from "@/utils/sort";
 import FaviconImg from "@/components/FaviconImg.vue";
 import Search from "./components/Search.vue";
@@ -392,9 +393,7 @@ const loading = ref(true);
 const current = ref<"added" | "search" | "faq">("added");
 const links = ref<LinkRecord[]>([]);
 const modal = ref<ModalLink | null>(null);
-const faqContent = ref(
-  "# FAQ\n\nTODO: интеграция с бэкендом (Convex/Supabase) — загрузка FAQ с API."
-);
+const faqContent = ref("# FAQ\n\nЗагрузка…");
 
 interface ModalLink extends Partial<LinkRecord> {
   tags: { manga: number; anime: number; ranobe: number };
@@ -437,12 +436,23 @@ watch(modal, (v) => {
 
 onMounted(async () => {
   await updateLinks();
-  // TODO: integrate with backend (Convex/Supabase) — GET /altWatcher/faq
-  // try { const res = await fetch(`${apiDomain}/altWatcher/faq`); faqContent.value = await res.text(); } catch {}
+  if (hasApi() && apiBaseUrl) {
+    try {
+      const res = await fetch(`${apiBaseUrl}/altWatcher/faq`);
+      if (res.ok) faqContent.value = await res.text();
+    } catch {
+      // keep default text
+    }
+  }
 });
 
 async function updateLinks() {
-  const results = await getAllLinks();
+  const results = await new Promise<LinkRecord[]>((resolve) => {
+    browser.runtime.sendMessage(
+      { do: "getAltWatcherLinksLocal" },
+      (r: LinkRecord[] | undefined) => resolve(Array.isArray(r) ? r : [])
+    );
+  });
   const withFavicon = (results || []).map((e) => {
     if (e.favicon) return e;
     try {
@@ -460,10 +470,27 @@ async function saveLink(l: ModalLink) {
   const payload = { ...l };
   delete (payload as { publish?: boolean }).publish;
   delete (payload as { action?: string }).action;
-  if (l.publish && !l.hash_id) {
-    // TODO: integrate with backend (Convex/Supabase) — POST /altWatcher/link
-    // const res = await fetch(`${apiDomain}/altWatcher/link`, { method: 'POST', body: JSON.stringify({...}) });
-    // const { id } = await res.json(); payload.id = id;
+  if (l.publish && !l.hash_id && hasApi() && apiBaseUrl) {
+    try {
+      const res = await fetch(`${apiBaseUrl}/altWatcher/link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: l.title,
+          link: l.link,
+          description: l.description ?? "",
+          manga: l.tags?.manga ?? 0,
+          anime: l.tags?.anime ?? 0,
+          ranobe: l.tags?.ranobe ?? 0,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.id === "number") payload.id = data.id;
+      }
+    } catch (_) {
+      // fallback: save locally without server id
+    }
   }
   await putLink(payload as LinkRecord);
   const idx = links.value.findIndex(
@@ -472,7 +499,12 @@ async function saveLink(l: ModalLink) {
   if (idx >= 0) {
     links.value[idx] = { ...links.value[idx], ...payload };
   } else {
-    const all = await getAllLinks();
+    const all = await new Promise<LinkRecord[]>((resolve) => {
+      browser.runtime.sendMessage(
+        { do: "getAltWatcherLinksLocal" },
+        (r: LinkRecord[] | undefined) => resolve(Array.isArray(r) ? r : [])
+      );
+    });
     all.sort(sortByUsedTimes);
     links.value = all.map((e) =>
       e.favicon

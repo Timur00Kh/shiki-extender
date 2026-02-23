@@ -1,0 +1,43 @@
+services:
+  api:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    environment:
+      DB_PATH: /app/data/db.sqlite
+      PORT: "8080"
+    volumes:
+      - backend_data:/app/data
+    restart: unless-stopped
+
+  drizzle-studio:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    command:
+      ["npx", "drizzle-kit", "studio", "--host", "0.0.0.0", "--port", "4983"]
+    environment:
+      DB_PATH: /app/data/db.sqlite
+    volumes:
+      - backend_data:/app/data
+    restart: unless-stopped
+
+  reverse-proxy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    environment:
+      STUDIO_USER: admin
+      STUDIO_PASSWORD_HASH: "" # set via env or replace in Caddyfile
+    restart: unless-stopped
+    depends_on:
+      - api
+      - drizzle-studio
+
+volumes:
+  backend_data:
+  caddy_data:

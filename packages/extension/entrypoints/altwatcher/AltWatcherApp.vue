@@ -27,12 +27,16 @@
         <div v-show="dropdownOpen" class="altwatcher-dropdown-menu">
           <a
             v-for="link in computedLinks"
-            :key="link.hash_id"
+            :key="link.hash_id ?? link.id ?? link.link"
             :href="computeLink(link.link)"
             target="_blank"
             rel="noopener"
             class="altwatcher-dropdown-item"
-            :class="{ active: link.hash_id === current?.hash_id }"
+            :class="{
+              active:
+                (link.hash_id != null && link.hash_id === current?.hash_id) ||
+                (link.id != null && link.id === current?.id),
+            }"
             @click.prevent="
               setCurrent(link);
               dropdownOpen = false;
@@ -79,7 +83,8 @@ import { browser } from "wxt/browser";
 import FaviconImg from "@/components/FaviconImg.vue";
 
 interface LinkItem {
-  hash_id: number;
+  hash_id?: number;
+  id?: number;
   title: string;
   link: string;
   tags: { manga: number; anime: number; ranobe: number };
@@ -342,10 +347,12 @@ function setCurrent(link: LinkItem | null) {
   const pageTypeKey = titleType.value + pageType.value;
 
   if (!link) {
-    const hashId = getPrefServiceId(pageTypeKey);
-    const byHashId = links.value.find((e) => e.hash_id === hashId);
-    if (byHashId) {
-      current.value = byHashId;
+    const storedId = getPrefServiceId(pageTypeKey);
+    const found = links.value.find(
+      (e) => e.hash_id === storedId || e.id === storedId
+    );
+    if (found) {
+      current.value = found;
       return;
     }
     if (computedLinks.value.length) {
@@ -354,7 +361,8 @@ function setCurrent(link: LinkItem | null) {
     return;
   }
   current.value = link;
-  setPrefService(pageTypeKey, link.hash_id);
+  const idToStore = link.hash_id ?? link.id;
+  if (idToStore != null) setPrefService(pageTypeKey, idToStore);
 }
 
 function onCurrentClick() {
@@ -362,6 +370,7 @@ function onCurrentClick() {
     browser.runtime.sendMessage({
       do: "altWatcherLinkUsed",
       hash_id: current.value.hash_id,
+      id: current.value.id,
     });
   }
 }
@@ -403,7 +412,7 @@ function parseTitles() {
 }
 
 onMounted(() => {
-  browser.runtime.sendMessage({ do: "getAltWatcherLinks" }, onLinksGet);
+  browser.runtime.sendMessage({ do: "getAltWatcherLinksLocal" }, onLinksGet);
   pageType.value = document.querySelector('a.b-tag[href*="genre/12"]') ? 1 : 2;
   if (window.location.pathname.includes("anime")) titleType.value = "anime";
   else if (window.location.pathname.includes("manga"))

@@ -225,6 +225,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import type { LinkRecord } from "@/utils/db";
+import { browser } from "wxt/browser";
+import { hasApi } from "@/utils/api";
 import FaviconImg from "@/components/FaviconImg.vue";
 import linksDump from "./altwatcher_links_dump.json";
 
@@ -247,7 +249,6 @@ const params = ref({
 const query = ref<Array<SearchResultItem & { more?: boolean }>>([]);
 const loading = ref(false);
 
-// TODO: integrate with backend (Convex/Supabase) — fetch link list from API instead of local dump
 type SearchResultItem = {
   id: number;
   title: string;
@@ -260,6 +261,23 @@ type SearchResultItem = {
   number_of_downloads?: number;
 };
 const dump = linksDump as SearchResultItem[];
+
+function linkToSearchItem(
+  l: LinkRecord
+): SearchResultItem & { more?: boolean } {
+  return {
+    id: l.id ?? l.hash_id ?? 0,
+    title: l.title,
+    link: l.link,
+    description: l.description,
+    manga: l.tags?.manga ?? 0,
+    anime: l.tags?.anime ?? 0,
+    ranobe: l.tags?.ranobe ?? 0,
+    approved: l.approved ?? false,
+    number_of_downloads: l.number_of_downloads,
+    more: false,
+  };
+}
 
 function onSaveButtonClick(l: {
   id?: number;
@@ -275,7 +293,6 @@ function onSaveButtonClick(l: {
     tags: l.tags,
     description: l.description,
   });
-  // TODO: inc-num-of-downloads on backend
 }
 
 function onMoreButtonClick(id: number) {
@@ -286,21 +303,39 @@ function onMoreButtonClick(id: number) {
 async function startSearch() {
   loading.value = true;
   const p = params.value;
-  query.value = dump
-    .filter((e) => {
-      let match = true;
-      if (p.title && !e.title.toLowerCase().includes(p.title.toLowerCase()))
-        match = false;
-      if (p.manga && !(e.manga & p.manga)) match = false;
-      if (p.anime && !(e.anime & p.anime)) match = false;
-      if (p.ranobe && !(e.ranobe & p.ranobe)) match = false;
-      if (p.approved && !e.approved) match = false;
-      return match;
-    })
-    .map((e) => ({ ...e, more: false }));
-  setTimeout(() => {
+  try {
+    if (hasApi()) {
+      const results = await new Promise<LinkRecord[]>((resolve) => {
+        browser.runtime.sendMessage(
+          {
+            do: "getAltWatcherLinks",
+            title: p.title || undefined,
+            manga: p.manga || undefined,
+            anime: p.anime || undefined,
+            ranobe: p.ranobe || undefined,
+            approved: p.approved,
+          },
+          (r: LinkRecord[] | undefined) => resolve(Array.isArray(r) ? r : [])
+        );
+      });
+      query.value = results.map(linkToSearchItem);
+    } else {
+      query.value = dump
+        .filter((e) => {
+          let match = true;
+          if (p.title && !e.title.toLowerCase().includes(p.title.toLowerCase()))
+            match = false;
+          if (p.manga && !(e.manga & p.manga)) match = false;
+          if (p.anime && !(e.anime & p.anime)) match = false;
+          if (p.ranobe && !(e.ranobe & p.ranobe)) match = false;
+          if (p.approved && !e.approved) match = false;
+          return match;
+        })
+        .map((e) => ({ ...e, more: false }));
+    }
+  } finally {
     loading.value = false;
-  }, 300);
+  }
 }
 
 type ComputedLink = {
@@ -325,7 +360,9 @@ const computedQuery = computed<ComputedLink[]>(() =>
       approved: e.approved,
       number_of_downloads: e.number_of_downloads,
       description: e.description,
-      alreadyAdded: !!props.links.find((el) => el.id === e.id),
+      alreadyAdded: !!props.links.find(
+        (el) => el.id === e.id || el.link === e.link
+      ),
       more: e.more,
       favicon: (e as SearchResultItem & { favicon?: string }).favicon,
     };
