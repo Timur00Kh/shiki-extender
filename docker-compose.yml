@@ -24,9 +24,8 @@ services:
 
   reverse-proxy:
     image: caddy:2-alpine
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "80"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
