@@ -30,8 +30,9 @@ services:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
     environment:
-      STUDIO_USER: admin
-      STUDIO_PASSWORD_HASH: "" # set via env or replace in Caddyfile
+      # From host/Dockploy env; defaults: admin / password "admin"
+      STUDIO_USER: ${STUDIO_USER:-admin}
+      STUDIO_PASSWORD_HASH: ${STUDIO_PASSWORD_HASH:-$$2a$$14$$hjz1NfaRCn2tCPRv23lnbOFvoLQJZaJ2TXoMwFXJr6OiWYcjTU6.6}
     restart: unless-stopped
     depends_on:
       - api
